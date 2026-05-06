@@ -1,43 +1,50 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
-import {Provider} from "react-redux"
-import { store } from './redux/store.js'
-import Navbar from './components/Navbar.jsx'
-import Home from './pages/Home.jsx'
+import React, { StrictMode } from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+
+import { Provider } from "react-redux";
+import { store } from "./redux/store.js";
+
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+
+// Layout + Pages
+import Navbar from "./components/Navbar.jsx";
+import Home from "./pages/Home.jsx";
+import Cart from "./pages/Cart.jsx";
+import Orders from "./pages/Orders.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";   
+import Profile from "./pages/Profile.jsx";
 
 const router = createBrowserRouter([
   {
-    path:"/",
-    element:<Navbar />,
-    // errorElement
-    children:[
-      {index:true,element:<Home />},
-      // {path:"products",element:<ProductSection />,loader:ProductLoader,hydrateFallbackElement:<p>Loading...</p>},
-      // {path:"contact", element:<Contact />},
-      // {path:"product/:productId",
-    //   element:(<ProtectRoute>
-    // <SingleViewProduct />
-    // </ProtectRoute>),
-    //     loader:SingleProductLoader},
-    //   { path: "cart", element: 
-    //   <ProtectRoute>
-    //     <Cart /> 
-    //   </ProtectRoute>},
-    //   {path:"Login",element:<AdminLogin/>}
+    path: "/",
+    element: <Navbar />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: "cart", element: <Cart /> },
+      { path: "orders", element: <Orders /> },
+      { path: "profile", element: <Profile /> },
+    ],
+  },
 
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/signup",   
+    element: <Signup />,
+  },
+]);
 
-    ]
-  }
-])
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-    <StrictMode>
-      {/* <Provider store={store}> */}
-  <RouterProvider router={router} />
-  {/* </Provider> */}
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </StrictMode>
-)
-
-
+);
