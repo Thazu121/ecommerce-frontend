@@ -1,40 +1,85 @@
-import Navbar from "../components/Navbar";
-import CartList from "../components/CartList";
-import OrderSummary from "../components/OrderSummary";
+import { useSelector, useDispatch } from "react-redux";
+import { addToCart, removeFromCart } from "../redux/features/cartSlice";
 
-export default function CartPage() {
+export default function CartList() {
+  const { items } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+
+  if (items.length === 0) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow text-center text-gray-500">
+        Your cart is empty 🛒
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="space-y-4">
 
-      <Navbar />
+      {items.map((item) => (
+        <div
+          key={item.id}
+          className="flex gap-4 bg-white p-4 rounded-xl shadow"
+        >
 
-      <main className="flex-grow max-w-[1280px] mx-auto px-4 sm:px-6 py-8 sm:py-12 w-full">
+          {/* Image */}
+          <img
+            src={item.image}
+            alt={item.title}
+            className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+          />
 
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-          Your Shopping Bag
-        </h1>
+          {/* Info */}
+          <div className="flex-1">
 
-        <p className="text-sm text-gray-500 mb-8">
-          Review your items and proceed to checkout.
-        </p>
+            <h2 className="font-semibold text-gray-800 text-sm sm:text-base">
+              {item.title}
+            </h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <p className="text-gray-500 text-xs sm:text-sm">
+              {item.desc}
+            </p>
 
-          <div className="lg:col-span-8">
-            <CartList />
+            {/* Bottom */}
+            <div className="flex flex-wrap justify-between items-center mt-3 gap-2">
+
+              {/* Quantity */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() =>
+                    dispatch(addToCart({ ...item, quantity: -1 }))
+                  }
+                  className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                >
+                  -
+                </button>
+
+                <span className="text-sm">{item.quantity}</span>
+
+                <button
+                  onClick={() => dispatch(addToCart(item))}
+                  className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Price */}
+              <span className="font-bold text-indigo-600 text-sm sm:text-base">
+                ₹{item.price * item.quantity}
+              </span>
+            </div>
+
+            {/* Remove */}
+            <button
+              onClick={() => dispatch(removeFromCart(item.id))}
+              className="text-red-500 text-xs mt-2 hover:underline"
+            >
+              Remove
+            </button>
           </div>
-
-          <div className="lg:col-span-4">
-            <OrderSummary />
-          </div>
-
         </div>
-
-      </main>
-
-      <footer className="bg-white border-t text-center py-6 text-sm text-gray-500">
-        © 2024 LUXE
-      </footer>
+      ))}
 
     </div>
   );
