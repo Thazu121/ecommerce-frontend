@@ -34,7 +34,7 @@ export default function ProductDetails() {
     dispatch(addToCart(product));
 
     // GO TO CHECKOUT
-    navigate("/checkout");
+    navigate("/cart");
   };
 
   // =========================

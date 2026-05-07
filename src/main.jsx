@@ -11,8 +11,12 @@ import {
   Navigate,
 } from "react-router-dom";
 
+/* COMPONENTS */
 import Navbar from "./components/Navbar.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import AdminRoute from "./components/AdminRoute.jsx";
 
+/* PAGES */
 import Home from "./pages/Home.jsx";
 import Cart from "./pages/Cart.jsx";
 import Orders from "./pages/Orders.jsx";
@@ -22,23 +26,23 @@ import Profile from "./pages/Profile.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 import ProductManagement from "./pages/ProductManagement.jsx";
 
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import AdminRoute from "./components/AdminRoute.jsx";
-
 /* ---------------- ROUTER ---------------- */
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navbar />,
+    element: <Navbar />, // Layout wrapper
 
     children: [
+      /* HOME */
       { index: true, element: <Home /> },
 
+      /* PRODUCT DETAILS */
       {
         path: "products/:productId",
         element: <ProductDetails />,
       },
 
+      /* CART */
       {
         path: "cart",
         element: (
@@ -48,6 +52,7 @@ const router = createBrowserRouter([
         ),
       },
 
+      /* ORDERS (FIXED ✔ IMPORTANT) */
       {
         path: "orders",
         element: (
@@ -57,6 +62,7 @@ const router = createBrowserRouter([
         ),
       },
 
+      /* PROFILE */
       {
         path: "profile",
         element: (
@@ -66,6 +72,7 @@ const router = createBrowserRouter([
         ),
       },
 
+      /* ADMIN */
       {
         path: "admin/products",
         element: (
@@ -77,11 +84,15 @@ const router = createBrowserRouter([
     ],
   },
 
+  /* AUTH ROUTES */
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
+
+  /* FALLBACK */
   { path: "*", element: <Navigate to="/" replace /> },
 ]);
 
+/* ---------------- RENDER APP ---------------- */
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>

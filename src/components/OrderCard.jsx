@@ -15,16 +15,16 @@ export default function OrderCard({
   actions = [],
 }) {
 
-  // 🎨 Status Colors
+  // ✅ Backend Status Support
   const statusStyles = {
-    Processing:
+    pending:
       "bg-yellow-100 text-yellow-700",
 
-    Delivered:
-      "bg-green-100 text-green-700",
+    shipped:
+      "bg-blue-100 text-blue-700",
 
-    Cancelled:
-      "bg-red-100 text-red-600",
+    delivered:
+      "bg-green-100 text-green-700",
   };
 
   return (
@@ -35,7 +35,7 @@ export default function OrderCard({
 
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
 
-          {/* Left */}
+          {/* LEFT */}
           <div>
 
             <div className="flex items-center gap-2 mb-2">
@@ -48,40 +48,52 @@ export default function OrderCard({
               <h3 className="text-xl font-bold text-gray-800">
                 {id}
               </h3>
+
             </div>
 
-            {/* Info */}
+            {/* INFO */}
             <div className="flex flex-wrap gap-5 text-sm text-gray-500 mt-3">
 
               <div className="flex items-center gap-2">
+
                 <CalendarDays size={16} />
+
                 {date}
+
               </div>
 
               <div className="flex items-center gap-2">
+
                 <CreditCard size={16} />
+
                 {amount}
+
               </div>
+
             </div>
+
           </div>
 
-          {/* Status */}
+          {/* STATUS */}
           <div
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium w-fit ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium w-fit capitalize ${
               statusStyles[status] ||
               "bg-gray-100 text-gray-700"
             }`}
           >
 
-            {status === "Delivered" ? (
+            {status === "delivered" ? (
               <CheckCircle size={16} />
             ) : (
               <Truck size={16} />
             )}
 
             {status}
+
           </div>
+
         </div>
+
       </div>
 
       {/* PRODUCTS */}
@@ -94,6 +106,7 @@ export default function OrderCard({
         <div className="flex gap-4 overflow-x-auto pb-2">
 
           {images.map((img, i) => (
+
             <div
               key={i}
               className="min-w-[90px] group"
@@ -104,15 +117,20 @@ export default function OrderCard({
                 alt="product"
                 className="w-24 h-24 rounded-xl object-cover border border-gray-200 group-hover:scale-105 transition"
               />
+
             </div>
+
           ))}
+
         </div>
+
       </div>
 
       {/* FOOTER */}
       <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row gap-3 sm:justify-end">
 
         {actions.map((btn, i) => (
+
           <button
             key={i}
             className={`px-5 py-2.5 rounded-xl text-sm font-medium transition ${
@@ -121,10 +139,15 @@ export default function OrderCard({
                 : "border border-gray-300 hover:bg-gray-100 text-gray-700"
             }`}
           >
+
             {btn.label}
+
           </button>
+
         ))}
+
       </div>
+
     </div>
   );
 }

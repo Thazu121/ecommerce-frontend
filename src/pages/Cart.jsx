@@ -7,6 +7,8 @@ import {
   clearCart,
 } from "../redux/features/cartSlice";
 
+import { addOrder } from "../redux/features/orderSlice";
+
 import {
   Minus,
   Plus,
@@ -28,9 +30,7 @@ export default function CartList() {
   // =========================
   useEffect(() => {
     if (user?._id) {
-      const savedCart = localStorage.getItem(
-        `cart_${user._id}`
-      );
+      const savedCart = localStorage.getItem(`cart_${user._id}`);
 
       if (savedCart) {
         const parsedCart = JSON.parse(savedCart);
@@ -65,82 +65,74 @@ export default function CartList() {
   );
 
   const delivery = subtotal > 5000 ? 0 : 99;
-
   const total = subtotal + delivery;
 
+  // =========================
+  // PLACE ORDER (FIXED)
+  // =========================
   const handlePlaceOrder = async () => {
-  try {
+    try {
+      const token = localStorage.getItem("token");
 
-    const token = localStorage.getItem("token");
+      if (items.length === 0) {
+        alert("Cart is empty");
+        return;
+      }
 
-    const payload = {
-      products: items.map((item) => ({
-        productId: item.id || item._id,
+      const payload = {
+        products: items.map((item) => ({
+          productId: item.id || item._id,
+          title: item.title,
+          image: item.image,
+          price: Number(item.price),
+          quantity: Number(item.quantity),
+        })),
+      };
 
-        title: item.title,
-
-        image: item.image,
-
-        price: Number(item.price),
-
-        quantity: Number(item.quantity),
-      })),
-    };
-
-    console.log(payload);
-
-    await API.post(
-      "/order",
-      payload,
-      {
+      // 🔥 BACKEND ORDER
+      const res = await API.post("/order", payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
+      });
 
-    alert("Order placed successfully");
+      // 🔥 REDUX ORDER (IMPORTANT FIX)
+      const newOrder = {
+        id: res.data?.order?._id || Date.now(),
+        items,
+        total,
+        status: "Processing",
+        date: new Date().toISOString(),
+      };
 
-    dispatch(clearCart());
+      dispatch(addOrder(newOrder));
 
-    localStorage.removeItem(
-      `cart_${user._id}`
-    );
+      alert("Order placed successfully");
 
-  } catch (err) {
+      dispatch(clearCart());
 
-    console.log(
-      err.response?.data || err
-    );
+      localStorage.removeItem(`cart_${user._id}`);
 
-    alert(
-      err.response?.data?.message ||
-      "Order failed"
-    );
-  }
-};
+    } catch (err) {
+      console.log(err.response?.data || err);
+      alert(err.response?.data?.message || "Order failed");
+    }
+  };
+
   // =========================
   // EMPTY CART
   // =========================
   if (items.length === 0) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
-
         <div className="bg-zinc-900 text-white rounded-3xl p-10 text-center max-w-md w-full shadow-xl">
-
-          <ShoppingCart
-            size={80}
-            className="mx-auto text-zinc-500 mb-5"
-          />
-
+          <ShoppingCart size={80} className="mx-auto text-zinc-500 mb-5" />
           <h2 className="text-3xl font-bold mb-3">
             Your Cart is Empty
           </h2>
-
           <p className="text-zinc-400">
             Add some amazing products to continue shopping.
           </p>
-
         </div>
       </div>
     );
@@ -155,149 +147,105 @@ export default function CartList() {
         {items.map((item) => (
           <div
             key={item.id || item._id}
-            className="bg-zinc-900 text-white rounded-2xl p-5 flex flex-col md:flex-row gap-5 shadow-lg hover:shadow-purple-500/10 transition"
+            className="bg-zinc-900 text-white rounded-2xl p-5 flex flex-col md:flex-row gap-5 shadow-lg"
           >
-
             {/* IMAGE */}
-            <div className="flex justify-center">
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-32 h-32 object-contain bg-white rounded-xl p-3"
-              />
+            <img
+              src={item.image}
+              className="w-32 h-32 object-contain bg-white rounded-xl p-3"
+            />
+
+            {/* INFO */}
+            <div className="flex-1">
+
+              <h2 className="text-xl font-semibold">
+                {item.title}
+              </h2>
+
+              <p className="text-zinc-400 text-sm mt-2">
+                {item.description || item.desc}
+              </p>
+
+              {/* QUANTITY */}
+              <div className="flex items-center gap-3 mt-4">
+
+                <button
+                  onClick={() =>
+                    dispatch(addToCart({ ...item, quantity: -1 }))
+                  }
+                  className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center"
+                >
+                  <Minus size={18} />
+                </button>
+
+                <span>{item.quantity}</span>
+
+                <button
+                  onClick={() => dispatch(addToCart(item))}
+                  className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center"
+                >
+                  <Plus size={18} />
+                </button>
+
+              </div>
             </div>
 
-            {/* CONTENT */}
-            <div className="flex-1 flex flex-col justify-between">
+            {/* PRICE + REMOVE */}
+            <div className="text-right">
 
-              <div>
+              <p className="text-xl text-purple-500 font-bold">
+                ₹{item.price * item.quantity}
+              </p>
 
-                <h2 className="text-xl font-semibold line-clamp-1">
-                  {item.title}
-                </h2>
-
-                <p className="text-zinc-400 text-sm mt-2 line-clamp-2">
-                  {item.description || item.desc}
-                </p>
-
-              </div>
-
-              {/* BOTTOM */}
-              <div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-
-                {/* QUANTITY */}
-                <div className="flex items-center gap-3">
-
-                  <button
-                    onClick={() =>
-                      dispatch(
-                        addToCart({
-                          ...item,
-                          quantity: -1,
-                        })
-                      )
-                    }
-                    className="w-10 h-10 rounded-lg bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition"
-                  >
-                    <Minus size={18} />
-                  </button>
-
-                  <span className="text-lg font-bold w-6 text-center">
-                    {item.quantity}
-                  </span>
-
-                  <button
-                    onClick={() =>
-                      dispatch(addToCart(item))
-                    }
-                    className="w-10 h-10 rounded-lg bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition"
-                  >
-                    <Plus size={18} />
-                  </button>
-
-                </div>
-
-                {/* PRICE + REMOVE */}
-                <div className="flex items-center justify-between md:justify-end gap-6">
-
-                  <span className="text-2xl font-bold text-purple-500">
-                    ₹{item.price * item.quantity}
-                  </span>
-
-                  <button
-                    onClick={() =>
-                      dispatch(removeFromCart(item.id || item._id))
-                    }
-                    className="flex items-center gap-2 text-red-400 hover:text-red-500 transition"
-                  >
-                    <Trash2 size={18} />
-                    Remove
-                  </button>
-
-                </div>
-
-              </div>
+              <button
+                onClick={() =>
+                  dispatch(removeFromCart(item.id || item._id))
+                }
+                className="text-red-400 flex items-center gap-1 mt-3"
+              >
+                <Trash2 size={16} />
+                Remove
+              </button>
 
             </div>
           </div>
         ))}
       </div>
 
-      {/* ORDER SUMMARY */}
-      <div className="bg-zinc-900 text-white rounded-3xl p-6 h-fit sticky top-24 shadow-xl">
+      {/* SUMMARY */}
+      <div className="bg-zinc-900 text-white rounded-3xl p-6 h-fit sticky top-24">
 
         <h2 className="text-2xl font-bold mb-6">
           Order Summary
         </h2>
 
-        <div className="space-y-4 border-b border-zinc-700 pb-5">
-
+        <div className="space-y-3 border-b border-zinc-700 pb-5">
           <div className="flex justify-between">
-            <span className="text-zinc-400">
-              Subtotal
-            </span>
-
-            <span>
-              ₹{subtotal.toFixed(2)}
-            </span>
+            <span>Subtotal</span>
+            <span>₹{subtotal}</span>
           </div>
 
           <div className="flex justify-between">
-            <span className="text-zinc-400">
-              Delivery
-            </span>
-
-            <span>
-              {delivery === 0 ? "Free" : `₹${delivery}`}
-            </span>
+            <span>Delivery</span>
+            <span>{delivery === 0 ? "Free" : `₹${delivery}`}</span>
           </div>
-
         </div>
 
-        {/* TOTAL */}
-        <div className="flex justify-between items-center mt-6 mb-8">
-
-          <span className="text-xl font-semibold">
-            Total
-          </span>
-
-          <span className="text-3xl font-bold text-purple-500">
-            ₹{total.toFixed(2)}
-          </span>
-
+        <div className="flex justify-between mt-6 text-xl font-bold">
+          <span>Total</span>
+          <span className="text-purple-500">₹{total}</span>
         </div>
 
-        {/* BUTTON */}
+        {/* PLACE ORDER */}
         <button
           onClick={handlePlaceOrder}
-          className="w-full bg-purple-600 hover:bg-purple-700 py-4 rounded-2xl font-semibold text-lg flex items-center justify-center gap-3 transition"
+          className="w-full mt-6 bg-purple-600 hover:bg-purple-700 py-4 rounded-2xl flex items-center justify-center gap-2"
         >
-          <CreditCard size={22} />
+          <CreditCard size={20} />
           Place Order
         </button>
 
       </div>
-
     </div>
   );
 }
