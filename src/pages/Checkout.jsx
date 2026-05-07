@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../redux/features/cartSlice";
+import { addOrder } from "../redux/features/orderSlice";
 import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
@@ -17,44 +18,28 @@ export default function Checkout() {
   });
 
   const [errors, setErrors] = useState({});
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // handle input
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // validation
+  // improved validation
   const validate = () => {
     let newErrors = {};
 
-    if (!form.name) newErrors.name = "Name required";
-    if (!form.address) newErrors.address = "Address required";
-    if (!form.city) newErrors.city = "City required";
-    if (!form.card) newErrors.card = "Card required";
+    if (!form.name.trim()) newErrors.name = "Name required";
+    if (!form.address.trim()) newErrors.address = "Address required";
+    if (!form.city.trim()) newErrors.city = "City required";
 
-    if (form.card && form.card.length < 12)
-      newErrors.card = "Invalid card number";
+    // simple card validation (16 digits)
+    const cardRegex = /^[0-9]{16}$/;
+    if (!cardRegex.test(form.card)) {
+      newErrors.card = "Card must be 16 digits";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  // submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (items.length === 0) {
-      alert("Cart is empty");
-      return;
-    }
-
-    if (!validate()) return;
-
-    // 👉 here later you can save order in redux/db
-
-    dispatch(clearCart());
-
-    navigate("/orders"); // go to orders page
   };
 
   const total = items.reduce(
@@ -62,97 +47,95 @@ export default function Checkout() {
     0
   );
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+
+    if (items.length === 0) {
+      setErrorMsg("Cart is empty");
+      return;
+    }
+
+    if (!validate()) return;
+
+    const order = {
+      id: Date.now(),
+      items,
+      customer: form,
+      total,
+      date: new Date().toISOString(),
+    };
+
+    // ✅ save order first
+    dispatch(addOrder(order));
+
+    // then clear cart
+    dispatch(clearCart());
+
+    navigate("/orders");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 grid md:grid-cols-2 gap-8">
 
-        {/* LEFT - FORM */}
+        {/* FORM */}
         <form
           onSubmit={handleSubmit}
           className="bg-white p-6 rounded-xl shadow space-y-4"
         >
-          <h1 className="text-xl font-semibold mb-2">
-            Shipping Details
-          </h1>
+          <h1 className="text-xl font-semibold">Shipping Details</h1>
 
-          {/* Name */}
-          <div>
-            <input
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              className={`w-full border p-3 rounded ${
-                errors.name ? "border-red-400" : ""
-              }`}
-            />
-            {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-            )}
-          </div>
+          {errorMsg && (
+            <p className="text-red-500 text-sm">{errorMsg}</p>
+          )}
 
-          {/* Address */}
-          <div>
-            <input
-              name="address"
-              placeholder="Address"
-              value={form.address}
-              onChange={handleChange}
-              className={`w-full border p-3 rounded ${
-                errors.address ? "border-red-400" : ""
-              }`}
-            />
-            {errors.address && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.address}
-              </p>
-            )}
-          </div>
+          <input
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            className="w-full border p-3 rounded"
+          />
+          {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
 
-          {/* City */}
-          <div>
-            <input
-              name="city"
-              placeholder="City"
-              value={form.city}
-              onChange={handleChange}
-              className={`w-full border p-3 rounded ${
-                errors.city ? "border-red-400" : ""
-              }`}
-            />
-            {errors.city && (
-              <p className="text-red-500 text-xs mt-1">{errors.city}</p>
-            )}
-          </div>
+          <input
+            name="address"
+            placeholder="Address"
+            value={form.address}
+            onChange={handleChange}
+            className="w-full border p-3 rounded"
+          />
+          {errors.address && <p className="text-red-500 text-xs">{errors.address}</p>}
 
-          {/* Card */}
-          <div>
-            <input
-              name="card"
-              placeholder="Card Number"
-              value={form.card}
-              onChange={handleChange}
-              className={`w-full border p-3 rounded ${
-                errors.card ? "border-red-400" : ""
-              }`}
-            />
-            {errors.card && (
-              <p className="text-red-500 text-xs mt-1">{errors.card}</p>
-            )}
-          </div>
+          <input
+            name="city"
+            placeholder="City"
+            value={form.city}
+            onChange={handleChange}
+            className="w-full border p-3 rounded"
+          />
+          {errors.city && <p className="text-red-500 text-xs">{errors.city}</p>}
 
-          <button className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-500 transition">
+          <input
+            name="card"
+            placeholder="Card Number (16 digits)"
+            value={form.card}
+            onChange={handleChange}
+            className="w-full border p-3 rounded"
+          />
+          {errors.card && <p className="text-red-500 text-xs">{errors.card}</p>}
+
+          <button className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-500">
             Place Order
           </button>
         </form>
 
-        {/* RIGHT - SUMMARY */}
+        {/* SUMMARY */}
         <div className="bg-white p-6 rounded-xl shadow h-fit">
-          <h2 className="text-lg font-semibold mb-4">
-            Order Summary
-          </h2>
+          <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
 
           {items.length === 0 ? (
             <p className="text-gray-500">No items</p>
