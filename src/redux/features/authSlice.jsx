@@ -1,15 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const getUser = () => {
-  try {
-    return JSON.parse(localStorage.getItem("user"));
-  } catch {
-    return null;
-  }
-};
-
 const initialState = {
-  user: getUser(),
+  user: JSON.parse(localStorage.getItem("user")) || null,
   token: localStorage.getItem("token") || null,
   loading: false,
   error: null,
@@ -19,48 +11,72 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    authStart: (state) => {
+    // 🔐 LOGIN
+    loginStart: (state) => {
       state.loading = true;
       state.error = null;
     },
 
-    authSuccess: (state, action) => {
+    loginSuccess: (state, action) => {
       state.loading = false;
       state.user = action.payload.user;
       state.token = action.payload.token;
-      state.error = null;
 
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      localStorage.setItem(
+        "user",
+        JSON.stringify(action.payload.user)
+      );
       localStorage.setItem("token", action.payload.token);
     },
 
-    authFailure: (state, action) => {
+    loginFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
 
+    // 🧾 SIGNUP
+    signupStart: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+
+    signupSuccess: (state, action) => {
+      state.loading = false;
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(action.payload.user)
+      );
+      localStorage.setItem("token", action.payload.token);
+    },
+
+    signupFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    // 🚪 LOGOUT
     logout: (state) => {
       state.user = null;
       state.token = null;
-      state.loading = false;
       state.error = null;
 
       localStorage.removeItem("user");
       localStorage.removeItem("token");
     },
-
-    clearError: (state) => {
-      state.error = null;
-    },
   },
 });
 
 export const {
-  authStart,
-  authSuccess,
-  authFailure,
+  loginStart,
+  loginSuccess,
+  loginFailure,
+  signupStart,
+  signupSuccess,
+  signupFailure,
   logout,
-  clearError,
 } = authSlice.actions;
 
 export default authSlice.reducer;

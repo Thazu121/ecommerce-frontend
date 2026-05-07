@@ -11,7 +11,6 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// Layout + Pages
 import Navbar from "./components/Navbar.jsx";
 
 import Home from "./pages/Home.jsx";
@@ -20,34 +19,26 @@ import Orders from "./pages/Orders.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
-
 import ProductDetails from "./pages/ProductDetails.jsx";
-// import ProductManagement from "./pages/ProductManagement.jsx";
+import ProductManagement from "./pages/ProductManagement.jsx";
 
-// Protected Routes
-import ProtectedRoute from "./components/ProtectesRoute.jsx"
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminRoute from "./components/AdminRoute.jsx";
 
-// 🌐 Router
+/* ---------------- ROUTER ---------------- */
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Navbar />,
 
     children: [
-      // 🏠 Home
-      {
-        index: true,
-        element: <Home />,
-      },
+      { index: true, element: <Home /> },
 
-      // 📦 Product Details
       {
-        path: "product/:id",
+        path: "products/:productId",
         element: <ProductDetails />,
       },
 
-      // 🛒 Cart
       {
         path: "cart",
         element: (
@@ -57,7 +48,6 @@ const router = createBrowserRouter([
         ),
       },
 
-      // 📋 Orders
       {
         path: "orders",
         element: (
@@ -67,7 +57,6 @@ const router = createBrowserRouter([
         ),
       },
 
-      // 👤 Profile
       {
         path: "profile",
         element: (
@@ -77,7 +66,6 @@ const router = createBrowserRouter([
         ),
       },
 
-      // 🔐 ADMIN PRODUCT PAGE
       {
         path: "admin/products",
         element: (
@@ -89,26 +77,11 @@ const router = createBrowserRouter([
     ],
   },
 
-  // 🔑 Login
-  {
-    path: "/login",
-    element: <Login />,
-  },
-
-  // 📝 Signup
-  {
-    path: "/signup",
-    element: <Signup />,
-  },
-
-  // ❌ 404
-  {
-    path: "*",
-    element: <Navigate to="/" replace />,
-  },
+  { path: "/login", element: <Login /> },
+  { path: "/signup", element: <Signup /> },
+  { path: "*", element: <Navigate to="/" replace /> },
 ]);
 
-// 🚀 Render
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>

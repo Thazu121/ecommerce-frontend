@@ -1,12 +1,24 @@
-import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../redux/features/cartSlice";
 import { addOrder } from "../redux/features/orderSlice";
 import { useNavigate } from "react-router-dom";
 
+import OrderSummary from "../components/OrderSummary";
+
+import {
+  CreditCard,
+  MapPin,
+  User,
+ Building,
+  ShoppingBag,
+} from "lucide-react";
+
 export default function Checkout() {
-  const { items } = useSelector((state) => state.cart);
+  const { items } = useSelector(
+    (state) => state.cart
+  );
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -18,147 +30,340 @@ export default function Checkout() {
   });
 
   const [errors, setErrors] = useState({});
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] =
+    useState("");
 
+  // 🧠 Handle Input
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]:
+        e.target.value,
+    });
   };
 
-  // improved validation
+  // ✅ Validation
   const validate = () => {
     let newErrors = {};
 
-    if (!form.name.trim()) newErrors.name = "Name required";
-    if (!form.address.trim()) newErrors.address = "Address required";
-    if (!form.city.trim()) newErrors.city = "City required";
+    // Name
+    if (!form.name.trim()) {
+      newErrors.name =
+        "Name is required";
+    }
 
-    // simple card validation (16 digits)
-    const cardRegex = /^[0-9]{16}$/;
-    if (!cardRegex.test(form.card)) {
-      newErrors.card = "Card must be 16 digits";
+    // Address
+    if (!form.address.trim()) {
+      newErrors.address =
+        "Address is required";
+    }
+
+    // City
+    if (!form.city.trim()) {
+      newErrors.city =
+        "City is required";
+    }
+
+    // Card
+    const cardRegex =
+      /^[0-9]{16}$/;
+
+    if (
+      !cardRegex.test(form.card)
+    ) {
+      newErrors.card =
+        "Card must be 16 digits";
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    return (
+      Object.keys(newErrors)
+        .length === 0
+    );
   };
 
+  // 💰 Total
   const total = items.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+    (acc, item) =>
+      acc +
+      item.price * item.quantity,
     0
   );
 
+  // 🚀 Place Order
   const handleSubmit = (e) => {
     e.preventDefault();
+
     setErrorMsg("");
 
+    // Empty cart
     if (items.length === 0) {
-      setErrorMsg("Cart is empty");
+      setErrorMsg(
+        "Your cart is empty"
+      );
       return;
     }
-
+    // Validation
     if (!validate()) return;
 
+    // Create order
     const order = {
       id: Date.now(),
       items,
       customer: form,
       total,
-      date: new Date().toISOString(),
+      status: "Processing",
+      date:
+        new Date().toISOString(),
     };
 
-    // ✅ save order first
+    // Save order
     dispatch(addOrder(order));
 
-    // then clear cart
+    // Clear cart
     dispatch(clearCart());
 
+    // Redirect
     navigate("/orders");
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
+    <div className="min-h-screen bg-gray-100 py-8 px-4 md:px-6">
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 grid md:grid-cols-2 gap-8">
+      <div className="max-w-7xl mx-auto">
 
-        {/* FORM */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-xl shadow space-y-4"
-        >
-          <h1 className="text-xl font-semibold">Shipping Details</h1>
+        {/* Header */}
+        <div className="mb-8">
 
-          {errorMsg && (
-            <p className="text-red-500 text-sm">{errorMsg}</p>
-          )}
+          <h1 className="text-3xl font-bold text-gray-800">
+            Checkout
+          </h1>
 
-          <input
-            name="name"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={handleChange}
-            className="w-full border p-3 rounded"
-          />
-          {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
+          <p className="text-gray-500 mt-1">
+            Complete your order
+            securely
+          </p>
+        </div>
 
-          <input
-            name="address"
-            placeholder="Address"
-            value={form.address}
-            onChange={handleChange}
-            className="w-full border p-3 rounded"
-          />
-          {errors.address && <p className="text-red-500 text-xs">{errors.address}</p>}
+        {/* Layout */}
+        <div className="grid lg:grid-cols-3 gap-8">
 
-          <input
-            name="city"
-            placeholder="City"
-            value={form.city}
-            onChange={handleChange}
-            className="w-full border p-3 rounded"
-          />
-          {errors.city && <p className="text-red-500 text-xs">{errors.city}</p>}
+          {/* LEFT FORM */}
+          <form
+            onSubmit={
+              handleSubmit
+            }
+            className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6 md:p-8"
+          >
 
-          <input
-            name="card"
-            placeholder="Card Number (16 digits)"
-            value={form.card}
-            onChange={handleChange}
-            className="w-full border p-3 rounded"
-          />
-          {errors.card && <p className="text-red-500 text-xs">{errors.card}</p>}
+            {/* Title */}
+            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
 
-          <button className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-500">
-            Place Order
-          </button>
-        </form>
+              <ShoppingBag
+                size={22}
+              />
 
-        {/* SUMMARY */}
-        <div className="bg-white p-6 rounded-xl shadow h-fit">
-          <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+              Shipping Details
+            </h2>
 
-          {items.length === 0 ? (
-            <p className="text-gray-500">No items</p>
-          ) : (
-            <>
-              {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex justify-between text-sm mb-2"
-                >
-                  <span>
-                    {item.title} x {item.quantity}
-                  </span>
-                  <span>₹{item.price * item.quantity}</span>
-                </div>
-              ))}
+            {/* Error */}
+            {errorMsg && (
+              <div className="bg-red-100 text-red-600 text-sm px-4 py-3 rounded-lg mb-5">
 
-              <div className="border-t mt-4 pt-4 flex justify-between font-bold">
-                <span>Total</span>
-                <span className="text-indigo-600">₹{total}</span>
+                {errorMsg}
               </div>
-            </>
-          )}
+            )}
+
+            {/* Grid */}
+            <div className="grid md:grid-cols-2 gap-5">
+
+              {/* Name */}
+              <div>
+                <label className="text-sm text-gray-600 mb-2 block">
+
+                  Full Name
+                </label>
+
+                <div className="relative">
+
+                  <User
+                    size={18}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+
+                  <input
+                    type="text"
+                    name="name"
+                    value={
+                      form.name
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    placeholder="John Doe"
+                    className={`w-full border ${
+                      errors.name
+                        ? "border-red-400"
+                        : "border-gray-300"
+                    } rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200`}
+                  />
+                </div>
+
+                {errors.name && (
+                  <p className="text-red-500 text-xs mt-1">
+
+                    {
+                      errors.name
+                    }
+                  </p>
+                )}
+              </div>
+
+              {/* City */}
+              <div>
+                <label className="text-sm text-gray-600 mb-2 block">
+
+                  City
+                </label>
+
+                <div className="relative">
+
+                  <Building
+                    size={18}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+
+                  <input
+                    type="text"
+                    name="city"
+                    value={
+                      form.city
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    placeholder="Mumbai"
+                    className={`w-full border ${
+                      errors.city
+                        ? "border-red-400"
+                        : "border-gray-300"
+                    } rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200`}
+                  />
+                </div>
+
+                {errors.city && (
+                  <p className="text-red-500 text-xs mt-1">
+
+                    {
+                      errors.city
+                    }
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Address */}
+            <div className="mt-5">
+
+              <label className="text-sm text-gray-600 mb-2 block">
+
+                Address
+              </label>
+
+              <div className="relative">
+
+                <MapPin
+                  size={18}
+                  className="absolute left-3 top-4 text-gray-400"
+                />
+
+                <textarea
+                  rows="4"
+                  name="address"
+                  value={
+                    form.address
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="Street address..."
+                  className={`w-full border ${
+                    errors.address
+                      ? "border-red-400"
+                      : "border-gray-300"
+                  } rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200 resize-none`}
+                />
+              </div>
+
+              {errors.address && (
+                <p className="text-red-500 text-xs mt-1">
+
+                  {
+                    errors.address
+                  }
+                </p>
+              )}
+            </div>
+
+            {/* Card */}
+            <div className="mt-5">
+
+              <label className="text-sm text-gray-600 mb-2 block">
+
+                Card Number
+              </label>
+
+              <div className="relative">
+
+                <CreditCard
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+
+                <input
+                  type="text"
+                  name="card"
+                  value={
+                    form.card
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="1234567812345678"
+                  className={`w-full border ${
+                    errors.card
+                      ? "border-red-400"
+                      : "border-gray-300"
+                  } rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200`}
+                />
+              </div>
+
+              {errors.card && (
+                <p className="text-red-500 text-xs mt-1">
+
+                  {
+                    errors.card
+                  }
+                </p>
+              )}
+            </div>
+
+            {/* Button */}
+            <button
+              className="w-full mt-8 bg-indigo-600 hover:bg-indigo-500 transition text-white py-4 rounded-xl font-medium text-lg"
+            >
+
+              Place Order
+            </button>
+          </form>
+
+          {/* RIGHT */}
+          <OrderSummary
+            hideCheckout={
+              true
+            }
+          />
         </div>
       </div>
     </div>

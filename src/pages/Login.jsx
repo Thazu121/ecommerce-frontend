@@ -6,8 +6,8 @@ import {
   loginFailure,
 } from "../redux/features/authSlice";
 
-import API from "../api/api"
-import { useNavigate } from "react-router-dom";
+import API from "../api/api";
+import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
@@ -17,7 +17,6 @@ export default function Login() {
   const { loading, error } = useSelector((state) => state.auth);
 
   const [showPassword, setShowPassword] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const [form, setForm] = useState({
     email: "",
@@ -26,15 +25,12 @@ export default function Login() {
 
   const [errors, setErrors] = useState({});
 
-  // 🧠 Handle input
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ Validation
   const validate = () => {
     let newErrors = {};
-
     if (!form.email) newErrors.email = "Email is required";
     if (!form.password) newErrors.password = "Password is required";
 
@@ -42,7 +38,6 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // 🔐 Submit login
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -60,9 +55,7 @@ export default function Login() {
       navigate("/");
     } catch (err) {
       dispatch(
-        loginFailure(
-          err.response?.data?.message || "Login failed"
-        )
+        loginFailure(err.response?.data?.message || "Login failed")
       );
     }
   };
@@ -70,48 +63,37 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
 
-      {/* 🔷 Navbar */}
+      {/* 🔷 Navbar (Login Page Only) */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-          <h1 className="text-lg sm:text-xl font-bold text-indigo-600">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+
+          <h1 className="text-lg font-bold text-indigo-600">
             LUXE
           </h1>
 
-          <div className="hidden md:flex gap-6 text-gray-600">
-            <a href="#">Home</a>
-            <a href="#">Shop</a>
-            <a href="#">Orders</a>
-          </div>
+          {/* Home Link */}
+          <nav>
+            <Link
+              to="/"
+              className="text-gray-700 hover:text-indigo-600 font-medium"
+            >
+              Home
+            </Link>
+          </nav>
 
-          <span
-            className="md:hidden cursor-pointer text-2xl"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            ☰
-          </span>
         </div>
-
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="md:hidden px-6 pb-4 flex flex-col gap-3 text-gray-600">
-            <a href="#">Home</a>
-            <a href="#">Shop</a>
-            <a href="#">Orders</a>
-          </div>
-        )}
       </header>
 
-      {/* 🧩 Main */}
-      <main className="flex-grow flex items-center justify-center px-4 py-10 relative">
+      {/* 🧩 Login Section */}
+      <main className="flex flex-1 items-center justify-center px-4 relative">
 
-        {/* Background Blobs */}
+        {/* Background blobs */}
         <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-indigo-200 rounded-full blur-3xl -z-10"></div>
         <div className="absolute bottom-[-10%] left-[-10%] w-[200px] h-[200px] bg-green-200 rounded-full blur-3xl -z-10"></div>
 
         {/* Card */}
         <div className="w-full max-w-md bg-white p-6 sm:p-8 rounded-xl shadow-md">
 
-          {/* Title */}
           <div className="text-center mb-6">
             <h2 className="text-xl sm:text-2xl font-semibold">
               Welcome Back
@@ -121,31 +103,24 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Error */}
           {error && (
             <p className="text-red-500 text-sm text-center mb-3">
               {error}
             </p>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
 
             {/* Email */}
             <div>
               <label className="text-sm text-gray-500">Email</label>
-
               <input
                 name="email"
                 value={form.email}
                 onChange={handleChange}
                 type="email"
-                placeholder="Enter email"
-                className={`w-full mt-2 px-4 py-3 rounded-lg border ${
-                  errors.email ? "border-red-400" : "border-gray-300"
-                } focus:ring-2 focus:ring-indigo-200 outline-none`}
+                className="w-full mt-2 px-4 py-3 border rounded-lg"
               />
-
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.email}
@@ -163,12 +138,7 @@ export default function Login() {
                   value={form.password}
                   onChange={handleChange}
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
-                  className={`w-full mt-2 px-4 py-3 rounded-lg border ${
-                    errors.password
-                      ? "border-red-400"
-                      : "border-gray-300"
-                  } focus:ring-2 focus:ring-indigo-200 outline-none`}
+                  className="w-full mt-2 px-4 py-3 border rounded-lg"
                 />
 
                 <button
@@ -176,11 +146,7 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                 >
-                  {showPassword ? (
-                    <EyeOff size={20} />
-                  ) : (
-                    <Eye size={20} />
-                  )}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
 
@@ -194,7 +160,7 @@ export default function Login() {
             {/* Button */}
             <button
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-500 transition disabled:opacity-50"
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
@@ -203,10 +169,11 @@ export default function Login() {
           {/* Footer */}
           <p className="text-center mt-6 text-sm text-gray-500">
             Don’t have an account?
-            <a href="/signup" className="text-indigo-600 ml-1">
+            <Link to="/signup" className="text-indigo-600 ml-1">
               Sign up
-            </a>
+            </Link>
           </p>
+
         </div>
       </main>
     </div>

@@ -1,166 +1,88 @@
-import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { ShoppingCart, Eye, Star } from "lucide-react";
+import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/features/cartSlice";
 
-import {
-  ShoppingCart,
-  Trash2,
-  Eye,
-  Star,
-} from "lucide-react";
-
-import { Link } from "react-router-dom";
-import API from "../api/api"
-
-export default function ProductCard({
-  product,
-  fetchProducts,
-}) {
+export default function ProductCard({ product }) {
   const dispatch = useDispatch();
 
-  const { role } = useSelector((state) => state.auth);
-
-  // 🛒 Add To Cart
   const handleAdd = () => {
-    dispatch(
-      addToCart({
-        ...product,
-        qty: 1,
-      })
-    );
-  };
-
-  // 🗑️ Delete Product (Admin)
-  const handleDelete = async () => {
-    try {
-      await API.delete(`/products/${product._id}`);
-
-      fetchProducts();
-
-      alert("Product deleted");
-    } catch (err) {
-      console.log(err);
-      alert("Delete failed");
-    }
+    dispatch(addToCart(product));
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100">
+    <div className="bg-zinc-900 text-white rounded-2xl overflow-hidden shadow-lg hover:shadow-purple-500/20 hover:-translate-y-2 transition-all duration-300 group">
 
-      {/* IMAGE */}
-      <div className="relative overflow-hidden">
-
+      {/* Image */}
+      <div className="overflow-hidden bg-white p-4">
         <img
-          src={
-            product.image ||
-            "https://via.placeholder.com/500"
-          }
+          src={product.image}
           alt={product.title}
-          className="h-52 sm:h-64 w-full object-cover group-hover:scale-105 transition duration-500"
+          className="h-56 w-full object-contain group-hover:scale-110 transition duration-300"
         />
-
-        {/* Category */}
-        <span className="absolute top-3 left-3 bg-indigo-600 text-white text-xs px-3 py-1 rounded-full">
-          {product.category}
-        </span>
-
-        {/* Admin Delete */}
-        {role === "admin" && (
-          <button
-            onClick={handleDelete}
-            className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition"
-          >
-            <Trash2 size={16} />
-          </button>
-        )}
       </div>
 
-      {/* CONTENT */}
-      <div className="p-4">
+      {/* Content */}
+      <div className="p-5">
 
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-
-          <Star
-            size={16}
-            className="fill-yellow-400 text-yellow-400"
-          />
-          <Star
-            size={16}
-            className="fill-yellow-400 text-yellow-400"
-          />
-          <Star
-            size={16}
-            className="fill-yellow-400 text-yellow-400"
-          />
-          <Star
-            size={16}
-            className="fill-yellow-400 text-yellow-400"
-          />
-          <Star
-            size={16}
-            className="text-gray-300"
-          />
-
-          <span className="text-xs text-gray-500 ml-1">
-            (4.0)
-          </span>
-        </div>
+        {/* Category */}
+        <p className="text-purple-400 text-sm uppercase mb-2">
+          {product.category}
+        </p>
 
         {/* Title */}
-        <h3 className="font-semibold text-gray-800 text-base sm:text-lg line-clamp-1">
+        <h2 className="font-bold text-lg line-clamp-1">
           {product.title}
-        </h3>
+        </h2>
 
         {/* Description */}
-        <p className="text-gray-500 text-sm mt-1 line-clamp-2">
-          {product.desc}
+        <p className="text-zinc-400 text-sm line-clamp-2 mt-2">
+          {product.description}
         </p>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1 mt-3">
+          <Star size={16} className="fill-yellow-400 text-yellow-400" />
+
+          <span className="text-sm text-zinc-300">
+            {product.rating?.rate || 4.5}
+          </span>
+
+          <span className="text-xs text-zinc-500">
+            ({product.rating?.count || 120})
+          </span>
+        </div>
 
         {/* Price */}
         <div className="mt-4 flex items-center justify-between">
-
-          <span className="text-indigo-600 font-bold text-lg">
-            ₹{product.price}
-          </span>
-
-          {/* Stock */}
-          <span
-            className={`text-xs font-medium px-2 py-1 rounded-full ${
-              product.stock > 0
-                ? "bg-green-100 text-green-600"
-                : "bg-red-100 text-red-500"
-            }`}
-          >
-            {product.stock > 0
-              ? `${product.stock} In Stock`
-              : "Out of Stock"}
-          </span>
+          <p className="text-2xl font-bold text-purple-500">
+            ₹ {product.price}
+          </p>
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-2 mt-5">
+        <div className="flex gap-3 mt-5">
 
           {/* View */}
           <Link
-            to={`/product/${product._id}`}
-            className="flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-100 transition px-4 py-2 rounded-lg w-full text-sm font-medium"
+            to={`/products/${product.id}`}
+            className="flex-1 flex items-center justify-center gap-2 border border-zinc-700 hover:border-purple-500 hover:bg-purple-500/10 py-2 rounded-xl transition"
           >
             <Eye size={18} />
             View
           </Link>
 
-          {/* Add To Cart */}
-          {role !== "admin" && (
-            <button
-              onClick={handleAdd}
-              disabled={product.stock === 0}
-              className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 transition text-white px-4 py-2 rounded-lg w-full text-sm font-medium disabled:opacity-50"
-            >
-              <ShoppingCart size={18} />
-              Add
-            </button>
-          )}
+          {/* Add */}
+          <button
+            onClick={handleAdd}
+            className="flex-1 bg-purple-600 hover:bg-purple-700 py-2 rounded-xl flex items-center justify-center gap-2 transition"
+          >
+            <ShoppingCart size={18} />
+            Add
+          </button>
+
         </div>
+
       </div>
     </div>
   );

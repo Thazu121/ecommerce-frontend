@@ -1,138 +1,173 @@
-import { useState } from "react";
-import { ShoppingCart, Heart, Star } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { FaStar, FaShoppingCart } from "react-icons/fa";
+
+import { useDispatch } from "react-redux";
+import { addToCart } from "../redux/features/cartSlice";
 
 export default function ProductDetails() {
-  const [qty, setQty] = useState(1);
 
-  const product = {
-    title: "Lumina Essence Lamp",
-    price: 129,
-    image: "https://via.placeholder.com/600x600",
-    desc: "Premium minimalist lamp designed for modern interiors with elegant lighting and aesthetic appeal.",
-    category: "Home Decor",
-    stock: 12,
+  const { productId } = useParams();
+
+  const navigate = useNavigate();
+
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const dispatch = useDispatch();
+
+  // =========================
+  // ADD TO CART
+  // =========================
+  const handleAddToCart = () => {
+
+    dispatch(addToCart(product));
   };
 
+  // =========================
+  // BUY NOW
+  // =========================
+  const handleBuyNow = () => {
+
+    // ADD PRODUCT TO CART
+    dispatch(addToCart(product));
+
+    // GO TO CHECKOUT
+    navigate("/checkout");
+  };
+
+  // =========================
+  // FETCH PRODUCT
+  // =========================
+  useEffect(() => {
+
+    const fetchProduct = async () => {
+
+      try {
+
+        const res = await axios.get(
+          `https://fakestoreapi.com/products/${productId}`
+        );
+
+        setProduct(res.data);
+
+      } catch (err) {
+
+        console.log(err);
+
+      } finally {
+
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+
+  }, [productId]);
+
+  // =========================
+  // LOADING
+  // =========================
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white text-2xl bg-black">
+        Loading...
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-6">
+    <div className="min-h-screen bg-black text-white px-4 py-10">
 
-      <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-md overflow-hidden">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10">
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 p-6 md:p-10">
+        {/* ========================= */}
+        {/* IMAGE */}
+        {/* ========================= */}
+        <div className="bg-zinc-900 rounded-2xl p-6 flex items-center justify-center">
 
-          {/* LEFT IMAGE */}
-          <div className="flex items-center justify-center">
-            <img
-              src={product.image}
-              alt={product.title}
-              className="w-full max-w-[500px] rounded-2xl object-cover"
-            />
-          </div>
+          <img
+            src={product.image}
+            alt={product.title}
+            className="h-[400px] object-contain"
+          />
 
-          {/* RIGHT DETAILS */}
-          <div className="flex flex-col justify-center">
+        </div>
 
-            {/* Category */}
-            <span className="text-sm uppercase tracking-wide text-indigo-600 font-medium mb-2">
-              {product.category}
+        {/* ========================= */}
+        {/* INFO */}
+        {/* ========================= */}
+        <div>
+
+          {/* CATEGORY */}
+          <p className="text-purple-400 uppercase mb-2">
+            {product.category}
+          </p>
+
+          {/* TITLE */}
+          <h1 className="text-4xl font-bold mb-4">
+            {product.title}
+          </h1>
+
+          {/* RATING */}
+          <div className="flex items-center gap-2 mb-4">
+
+            <FaStar className="text-yellow-400" />
+
+            <span>
+              {product.rating?.rate} Rating
             </span>
 
-            {/* Title */}
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              {product.title}
-            </h1>
+            <span className="text-zinc-400">
+              ({product.rating?.count} Reviews)
+            </span>
 
-            {/* Ratings */}
-            <div className="flex items-center gap-1 mb-4">
-
-              <Star
-                size={18}
-                className="fill-yellow-400 text-yellow-400"
-              />
-              <Star
-                size={18}
-                className="fill-yellow-400 text-yellow-400"
-              />
-              <Star
-                size={18}
-                className="fill-yellow-400 text-yellow-400"
-              />
-              <Star
-                size={18}
-                className="fill-yellow-400 text-yellow-400"
-              />
-              <Star
-                size={18}
-                className="text-gray-300"
-              />
-
-              <span className="text-sm text-gray-500 ml-2">
-                (4.0 Reviews)
-              </span>
-            </div>
-
-            {/* Description */}
-            <p className="text-gray-600 leading-relaxed mb-6">
-              {product.desc}
-            </p>
-
-            {/* Price */}
-            <h2 className="text-4xl font-bold text-indigo-600 mb-4">
-              ${product.price}
-            </h2>
-
-            {/* Stock */}
-            <p className="text-green-600 font-medium mb-6">
-              In Stock ({product.stock} available)
-            </p>
-
-            {/* Quantity */}
-            <div className="flex items-center gap-4 mb-8">
-
-              <button
-                disabled={qty <= 1}
-                onClick={() => setQty(qty - 1)}
-                className="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-100 transition disabled:opacity-40"
-              >
-                -
-              </button>
-
-              <span className="text-lg font-semibold">
-                {qty}
-              </span>
-
-              <button
-                disabled={qty >= product.stock}
-                onClick={() => setQty(qty + 1)}
-                className="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-100 transition disabled:opacity-40"
-              >
-                +
-              </button>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-
-              {/* Add To Cart */}
-              <button
-                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 transition text-white px-6 py-4 rounded-xl w-full font-medium"
-              >
-                <ShoppingCart size={20} />
-                Add to Cart
-              </button>
-
-              {/* Wishlist */}
-              <button
-                className="flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-100 transition px-6 py-4 rounded-xl w-full font-medium"
-              >
-                <Heart size={20} />
-                Wishlist
-              </button>
-
-            </div>
           </div>
+
+          {/* PRICE */}
+          <h2 className="text-4xl font-bold text-purple-500 mb-6">
+            ₹ {product.price}
+          </h2>
+
+          {/* DESCRIPTION */}
+          <p className="text-zinc-300 leading-7 mb-8">
+            {product.description}
+          </p>
+
+          {/* ========================= */}
+          {/* BUTTONS */}
+          {/* ========================= */}
+          <div className="flex flex-col sm:flex-row gap-4">
+
+            {/* ADD TO CART */}
+            <button
+              onClick={handleAddToCart}
+              className="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2"
+            >
+
+              <FaShoppingCart />
+
+              Add To Cart
+
+            </button>
+
+            {/* BUY NOW */}
+            <button
+              onClick={handleBuyNow}
+              className="border border-purple-600 hover:bg-purple-600 px-8 py-3 rounded-xl font-semibold transition"
+            >
+
+              Buy Now
+
+            </button>
+
+          </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }

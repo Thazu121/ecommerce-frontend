@@ -7,18 +7,31 @@ const initialState = {
 const orderSlice = createSlice({
   name: "orders",
   initialState,
+
   reducers: {
+    // ➕ Add Order
     addOrder: (state, action) => {
-      state.orders.push({
-        id: Date.now(),
-        items: action.payload.items,
-        total: action.payload.total,
-        customer: action.payload.customer,
-        date: new Date().toLocaleString(),
-      });
+      state.orders.push(action.payload);
+    },
+
+    // ❌ Remove Order
+    removeOrder: (state, action) => {
+      state.orders = state.orders.filter(
+        (order) => order.id !== action.payload
+      );
+    },
+
+    // 🗑 Clear Orders
+    clearOrders: (state) => {
+      state.orders = [];
     },
   },
 });
 
-export const { addOrder } = orderSlice.actions;
+export const {
+  addOrder,
+  removeOrder,
+  clearOrders,
+} = orderSlice.actions;
+
 export default orderSlice.reducer;
