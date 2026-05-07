@@ -25,19 +25,30 @@ export default function Login() {
 
   const [errors, setErrors] = useState({});
 
+  // ======================
+  // INPUT HANDLER
+  // ======================
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // ======================
+  // VALIDATION
+  // ======================
   const validate = () => {
     let newErrors = {};
+
     if (!form.email) newErrors.email = "Email is required";
     if (!form.password) newErrors.password = "Password is required";
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
+  // ======================
+  // SUBMIT LOGIN
+  // ======================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -48,14 +59,27 @@ export default function Login() {
 
       const res = await API.post("/auth/login", form);
 
+      // 🔥 IMPORTANT: store user + token
       dispatch(loginSuccess(res.data));
 
       setForm({ email: "", password: "" });
 
-      navigate("/");
+      console.log("LOGIN RESPONSE:", res.data); // DEBUG
+
+      // ======================
+      // ROLE BASED REDIRECT
+      // ======================
+      if (res.data.user.role === "admin") {
+        navigate("/admin/products");
+      } else {
+        navigate("/");
+      }
+
     } catch (err) {
       dispatch(
-        loginFailure(err.response?.data?.message || "Login failed")
+        loginFailure(
+          err.response?.data?.message || "Login failed"
+        )
       );
     }
   };
@@ -63,7 +87,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
 
-      {/* 🔷 Navbar (Login Page Only) */}
+      {/* HEADER */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
 
@@ -71,38 +95,30 @@ export default function Login() {
             LUXE
           </h1>
 
-          {/* Home Link */}
-          <nav>
-            <Link
-              to="/"
-              className="text-gray-700 hover:text-indigo-600 font-medium"
-            >
-              Home
-            </Link>
-          </nav>
+          <Link
+            to="/"
+            className="text-gray-700 hover:text-indigo-600 font-medium"
+          >
+            Home
+          </Link>
 
         </div>
       </header>
 
-      {/* 🧩 Login Section */}
-      <main className="flex flex-1 items-center justify-center px-4 relative">
+      {/* LOGIN BODY */}
+      <main className="flex flex-1 items-center justify-center px-4">
 
-        {/* Background blobs */}
-        <div className="absolute top-[-10%] right-[-10%] w-[250px] h-[250px] bg-indigo-200 rounded-full blur-3xl -z-10"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[200px] h-[200px] bg-green-200 rounded-full blur-3xl -z-10"></div>
-
-        {/* Card */}
         <div className="w-full max-w-md bg-white p-6 sm:p-8 rounded-xl shadow-md">
 
-          <div className="text-center mb-6">
-            <h2 className="text-xl sm:text-2xl font-semibold">
-              Welcome Back
-            </h2>
-            <p className="text-gray-500 text-sm">
-              Login to continue shopping
-            </p>
-          </div>
+          <h2 className="text-2xl font-semibold text-center mb-1">
+            Welcome Back
+          </h2>
 
+          <p className="text-gray-500 text-sm text-center mb-6">
+            Login to continue shopping
+          </p>
+
+          {/* ERROR */}
           {error && (
             <p className="text-red-500 text-sm text-center mb-3">
               {error}
@@ -111,9 +127,12 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Email */}
+            {/* EMAIL */}
             <div>
-              <label className="text-sm text-gray-500">Email</label>
+              <label className="text-sm text-gray-500">
+                Email
+              </label>
+
               <input
                 name="email"
                 value={form.email}
@@ -121,6 +140,7 @@ export default function Login() {
                 type="email"
                 className="w-full mt-2 px-4 py-3 border rounded-lg"
               />
+
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.email}
@@ -128,11 +148,14 @@ export default function Login() {
               )}
             </div>
 
-            {/* Password */}
+            {/* PASSWORD */}
             <div>
-              <label className="text-sm text-gray-500">Password</label>
+              <label className="text-sm text-gray-500">
+                Password
+              </label>
 
               <div className="relative">
+
                 <input
                   name="password"
                   value={form.password}
@@ -143,11 +166,18 @@ export default function Login() {
 
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() =>
+                    setShowPassword(!showPassword)
+                  }
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
                 </button>
+
               </div>
 
               {errors.password && (
@@ -157,24 +187,29 @@ export default function Login() {
               )}
             </div>
 
-            {/* Button */}
+            {/* BUTTON */}
             <button
               disabled={loading}
               className="w-full bg-indigo-600 text-white py-3 rounded-lg"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
+
           </form>
 
-          {/* Footer */}
+          {/* SIGNUP LINK */}
           <p className="text-center mt-6 text-sm text-gray-500">
             Don’t have an account?
-            <Link to="/signup" className="text-indigo-600 ml-1">
+            <Link
+              to="/signup"
+              className="text-indigo-600 ml-1"
+            >
               Sign up
             </Link>
           </p>
 
         </div>
+
       </main>
     </div>
   );

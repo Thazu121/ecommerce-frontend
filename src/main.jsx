@@ -11,12 +11,10 @@ import {
   Navigate,
 } from "react-router-dom";
 
-/* COMPONENTS */
 import Navbar from "./components/Navbar.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminRoute from "./components/AdminRoute.jsx";
 
-/* PAGES */
 import Home from "./pages/Home.jsx";
 import Cart from "./pages/Cart.jsx";
 import Orders from "./pages/Orders.jsx";
@@ -24,25 +22,25 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
-import ProductManagement from "./pages/ProductManagement.jsx";
 
-/* ---------------- ROUTER ---------------- */
+import AdminLayout from "./pages/admin/AdminLayout.jsx";
+import Dashboard from "./pages/admin/Dashboard.jsx";
+import Products from "./pages/admin/Products.jsx";
+import Users from "./pages/admin/Users.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navbar />, // Layout wrapper
+    element: <Navbar />,
 
     children: [
-      /* HOME */
       { index: true, element: <Home /> },
 
-      /* PRODUCT DETAILS */
       {
         path: "products/:productId",
         element: <ProductDetails />,
       },
 
-      /* CART */
       {
         path: "cart",
         element: (
@@ -52,7 +50,6 @@ const router = createBrowserRouter([
         ),
       },
 
-      /* ORDERS (FIXED ✔ IMPORTANT) */
       {
         path: "orders",
         element: (
@@ -62,7 +59,6 @@ const router = createBrowserRouter([
         ),
       },
 
-      /* PROFILE */
       {
         path: "profile",
         element: (
@@ -71,28 +67,30 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-
-      /* ADMIN */
-      {
-        path: "admin/products",
-        element: (
-          <AdminRoute>
-            <ProductManagement />
-          </AdminRoute>
-        ),
-      },
     ],
   },
 
-  /* AUTH ROUTES */
+  {
+    path: "/admin",
+    element: (
+      <AdminRoute>
+        <AdminLayout />
+      </AdminRoute>
+    ),
+
+    children: [
+      { index: true, element: <Dashboard /> },
+      { path: "products", element: <Products /> },
+      { path: "users", element: <Users /> },
+    ],
+  },
+
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
 
-  /* FALLBACK */
   { path: "*", element: <Navigate to="/" replace /> },
 ]);
 
-/* ---------------- RENDER APP ---------------- */
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>

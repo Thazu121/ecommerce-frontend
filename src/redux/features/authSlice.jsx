@@ -11,14 +11,17 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // 🔐 LOGIN
+    // 🔐 LOGIN START
     loginStart: (state) => {
       state.loading = true;
       state.error = null;
     },
 
+    // ✅ LOGIN SUCCESS
     loginSuccess: (state, action) => {
       state.loading = false;
+
+      // 👇 IMPORTANT: expects { user, token }
       state.user = action.payload.user;
       state.token = action.payload.token;
 
@@ -29,19 +32,22 @@ const authSlice = createSlice({
       localStorage.setItem("token", action.payload.token);
     },
 
+    // ❌ LOGIN FAIL
     loginFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
 
-    // 🧾 SIGNUP
+    // 🧾 SIGNUP START
     signupStart: (state) => {
       state.loading = true;
       state.error = null;
     },
 
+    // ✅ SIGNUP SUCCESS
     signupSuccess: (state, action) => {
       state.loading = false;
+
       state.user = action.payload.user;
       state.token = action.payload.token;
 
@@ -52,6 +58,7 @@ const authSlice = createSlice({
       localStorage.setItem("token", action.payload.token);
     },
 
+    // ❌ SIGNUP FAIL
     signupFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
