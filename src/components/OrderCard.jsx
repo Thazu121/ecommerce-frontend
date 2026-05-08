@@ -15,7 +15,6 @@ export default function OrderCard({
   actions = [],
 }) {
 
-  // ✅ Backend Status Support
   const statusStyles = {
     pending:
       "bg-yellow-100 text-yellow-700",
@@ -30,12 +29,10 @@ export default function OrderCard({
   return (
     <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100">
 
-      {/* TOP */}
       <div className="p-6 border-b">
 
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
 
-          {/* LEFT */}
           <div>
 
             <div className="flex items-center gap-2 mb-2">
@@ -51,7 +48,6 @@ export default function OrderCard({
 
             </div>
 
-            {/* INFO */}
             <div className="flex flex-wrap gap-5 text-sm text-gray-500 mt-3">
 
               <div className="flex items-center gap-2">
@@ -74,7 +70,6 @@ export default function OrderCard({
 
           </div>
 
-          {/* STATUS */}
           <div
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium w-fit capitalize ${
               statusStyles[status] ||
@@ -96,7 +91,6 @@ export default function OrderCard({
 
       </div>
 
-      {/* PRODUCTS */}
       <div className="p-6">
 
         <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
@@ -126,7 +120,6 @@ export default function OrderCard({
 
       </div>
 
-      {/* FOOTER */}
       <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row gap-3 sm:justify-end">
 
         {actions.map((btn, i) => (

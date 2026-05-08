@@ -9,7 +9,6 @@ export default function AdminLayout() {
 
   const isActive = (path) => location.pathname === path;
 
-  // ================= LOGOUT =================
   const handleLogout = () => {
     dispatch(logout());
     localStorage.removeItem("token");
@@ -19,7 +18,6 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
 
-      {/* SIDEBAR */}
       <aside className="w-full md:w-64 bg-zinc-900 text-white p-5 flex flex-col justify-between">
 
         <div>
@@ -61,7 +59,6 @@ export default function AdminLayout() {
 
         </div>
 
-        {/* LOGOUT BUTTON */}
         <button
           onClick={handleLogout}
           className="mt-6 bg-red-500 hover:bg-red-600 text-white py-2 rounded"
@@ -71,7 +68,6 @@ export default function AdminLayout() {
 
       </aside>
 
-      {/* MAIN CONTENT */}
       <main className="flex-1 bg-gray-100 p-4 md:p-6">
         <Outlet />
       </main>

@@ -13,7 +13,6 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  // ================= FETCH BOTH =================
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -26,7 +25,6 @@ export default function Home() {
       const fakeProducts = fakeRes.data || [];
       const mongoProducts = mongoRes.data?.product || [];
 
-      // ================= NORMALIZE FAKE =================
       const fake = fakeProducts.map((p) => ({
         id: `fake-${p.id}`,
         name: p.title,
@@ -36,13 +34,12 @@ export default function Home() {
         source: "fake",
       }));
 
-      // ================= NORMALIZE MONGO =================
       const mongo = mongoProducts.map((p) => ({
         id: p._id,
         name: p.name,
         price: p.price,
         image: p.image
-          ? `http://localhost:5000${p.image}`   // ✅ FIX IMAGE HERE
+          ? `http://localhost:5000${p.image}`   
           : "/placeholder.png",
         description: p.description,
         source: "mongo",
@@ -58,7 +55,6 @@ export default function Home() {
     }
   };
 
-  // ================= FILTER + SORT =================
   const filtered = products
     .filter((p) =>
       (p.name || "").toLowerCase().includes(search.toLowerCase())
@@ -70,7 +66,6 @@ export default function Home() {
       return 0;
     });
 
-  // ================= LOADING =================
   if (loading) {
     return (
       <div className="text-center mt-10 text-lg font-medium">
@@ -82,12 +77,10 @@ export default function Home() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
 
-      {/* TITLE */}
       <h1 className="text-2xl font-bold mb-4">
         Products
       </h1>
 
-      {/* SEARCH + SORT */}
       <div className="flex gap-3 mb-6">
 
         <input
@@ -110,7 +103,6 @@ export default function Home() {
 
       </div>
 
-      {/* PRODUCTS GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
         {filtered.length > 0 ? (

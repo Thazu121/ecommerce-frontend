@@ -25,16 +25,12 @@ export default function Login() {
 
   const [errors, setErrors] = useState({});
 
-  // ======================
-  // INPUT HANDLER
-  // ======================
+  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ======================
-  // VALIDATION
-  // ======================
+
   const validate = () => {
     let newErrors = {};
 
@@ -46,9 +42,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ======================
-  // SUBMIT LOGIN
-  // ======================
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -59,16 +53,13 @@ export default function Login() {
 
       const res = await API.post("/auth/login", form);
 
-      // 🔥 IMPORTANT: store user + token
       dispatch(loginSuccess(res.data));
 
       setForm({ email: "", password: "" });
 
       console.log("LOGIN RESPONSE:", res.data); // DEBUG
 
-      // ======================
-      // ROLE BASED REDIRECT
-      // ======================
+    
       if (res.data.user.role === "admin") {
         navigate("/admin/products");
       } else {
@@ -87,7 +78,6 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
 
-      {/* HEADER */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
 
@@ -105,7 +95,6 @@ export default function Login() {
         </div>
       </header>
 
-      {/* LOGIN BODY */}
       <main className="flex flex-1 items-center justify-center px-4">
 
         <div className="w-full max-w-md bg-white p-6 sm:p-8 rounded-xl shadow-md">
@@ -118,7 +107,6 @@ export default function Login() {
             Login to continue shopping
           </p>
 
-          {/* ERROR */}
           {error && (
             <p className="text-red-500 text-sm text-center mb-3">
               {error}
@@ -127,7 +115,6 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* EMAIL */}
             <div>
               <label className="text-sm text-gray-500">
                 Email
@@ -148,7 +135,6 @@ export default function Login() {
               )}
             </div>
 
-            {/* PASSWORD */}
             <div>
               <label className="text-sm text-gray-500">
                 Password
@@ -187,7 +173,6 @@ export default function Login() {
               )}
             </div>
 
-            {/* BUTTON */}
             <button
               disabled={loading}
               className="w-full bg-indigo-600 text-white py-3 rounded-lg"
@@ -197,7 +182,6 @@ export default function Login() {
 
           </form>
 
-          {/* SIGNUP LINK */}
           <p className="text-center mt-6 text-sm text-gray-500">
             Don’t have an account?
             <Link

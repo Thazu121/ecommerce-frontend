@@ -144,7 +144,6 @@ export default function CartList() {
               </div>
             </div>
 
-            {/* PRICE + DELETE */}
             <div className="flex sm:flex-col justify-between items-center sm:items-end">
 
               <p className="text-purple-500 font-bold text-lg">
@@ -167,7 +166,6 @@ export default function CartList() {
 
       </div>
 
-      {/* SUMMARY */}
       <div className="bg-zinc-900 text-white p-5 rounded-2xl h-fit">
 
         <h2 className="text-xl font-bold mb-4">

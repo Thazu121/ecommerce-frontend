@@ -70,7 +70,6 @@ const router = createBrowserRouter([
         ),
       },
 
-      // ================= CONTACT ROUTE =================
       {
         path: "contact",
         element: <Contact />,

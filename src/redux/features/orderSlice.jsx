@@ -9,24 +9,20 @@ const orderSlice = createSlice({
   initialState,
 
   reducers: {
-    // ✅ SET ALL ORDERS (IMPORTANT FIX)
     setOrders: (state, action) => {
       state.orders = action.payload;
     },
 
-    // ➕ Add Order
     addOrder: (state, action) => {
       state.orders.push(action.payload);
     },
 
-    // ❌ Remove Order
     removeOrder: (state, action) => {
       state.orders = state.orders.filter(
         (order) => order._id !== action.payload
       );
     },
 
-    // 🗑 Clear Orders
     clearOrders: (state) => {
       state.orders = [];
     },

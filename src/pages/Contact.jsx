@@ -12,7 +12,6 @@ export default function Contact() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // ================= HANDLE INPUT =================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -20,7 +19,6 @@ export default function Contact() {
     });
   };
 
-  // ================= SUBMIT =================
   const handleSubmit = async (e) => {
     e.preventDefault();
 

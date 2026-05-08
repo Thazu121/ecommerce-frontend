@@ -17,7 +17,6 @@ export default function Products() {
   const [preview, setPreview] = useState(null);
   const [editId, setEditId] = useState(null);
 
-  // ================= GET PRODUCTS =================
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -42,7 +41,6 @@ export default function Products() {
     fetchProducts();
   }, []);
 
-  // ================= INPUT =================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -50,19 +48,16 @@ export default function Products() {
     });
   };
 
-  // ================= IMAGE VALIDATION =================
   const handleImage = (e) => {
     const file = e.target.files[0];
 
     if (!file) return;
 
-    // ✅ TYPE CHECK
     if (!file.type.startsWith("image/")) {
       alert("Only image files are allowed");
       return;
     }
 
-    // ✅ SIZE CHECK (2MB)
     if (file.size > 2 * 1024 * 1024) {
       alert("Image must be less than 2MB");
       return;
@@ -74,7 +69,6 @@ export default function Products() {
     setPreview(URL.createObjectURL(file));
   };
 
-  // ================= CREATE =================
   const handleCreate = async () => {
     try {
       setSubmitting(true);
@@ -85,7 +79,6 @@ export default function Products() {
       formData.append("category", form.category);
       formData.append("description", form.description);
 
-      // ✅ only append if exists
       if (form.image) {
         formData.append("image", form.image);
       }
@@ -110,7 +103,6 @@ export default function Products() {
     }
   };
 
-  // ================= DELETE =================
   const handleDelete = async (id) => {
     try {
       await API.delete(`/products/${id}`);
@@ -120,7 +112,6 @@ export default function Products() {
     }
   };
 
-  // ================= EDIT =================
   const handleEdit = (p) => {
     setForm({
       name: p.name,
@@ -137,7 +128,6 @@ export default function Products() {
     setEditId(p._id);
   };
 
-  // ================= UPDATE =================
   const handleUpdate = async () => {
     try {
       setSubmitting(true);
@@ -180,7 +170,6 @@ export default function Products() {
         🛠️ Products Admin Panel
       </h1>
 
-      {/* FORM */}
       <div className="bg-white p-4 rounded-xl shadow mb-6 space-y-3">
 
         <input
@@ -215,7 +204,6 @@ export default function Products() {
           className="border p-2 w-full rounded"
         />
 
-        {/* IMAGE */}
         <input
           type="file"
           accept="image/*"
@@ -223,7 +211,6 @@ export default function Products() {
           className="border p-2 w-full rounded"
         />
 
-        {/* PREVIEW */}
         {preview && (
           <img
             src={preview}
@@ -241,7 +228,6 @@ export default function Products() {
         </button>
       </div>
 
-      {/* LIST */}
       {loading ? (
         <p>Loading...</p>
       ) : (

@@ -13,7 +13,6 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ================= ADD TO CART =================
   const handleAddToCart = () => {
     dispatch(addToCart(product));
   };
@@ -23,7 +22,6 @@ export default function ProductDetails() {
     navigate("/cart");
   };
 
-  // ================= FETCH =================
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -31,7 +29,6 @@ export default function ProductDetails() {
 
         let finalProduct = null;
 
-        // ================= MONGO FIRST =================
         try {
           const mongoRes = await axios.get(
             `http://localhost:5000/products/${productId}`
@@ -56,7 +53,6 @@ export default function ProductDetails() {
           console.log("Mongo not found, fallback to fake");
         }
 
-        // ================= FAKE API FALLBACK =================
         if (!finalProduct) {
           const fakeRes = await axios.get(
             `https://fakestoreapi.com/products/${productId}`
@@ -88,7 +84,6 @@ export default function ProductDetails() {
     fetchProduct();
   }, [productId]);
 
-  // ================= LOADING =================
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white bg-black">
@@ -97,7 +92,6 @@ export default function ProductDetails() {
     );
   }
 
-  // ================= NOT FOUND =================
   if (!product) {
     return (
       <div className="text-center text-white mt-10">
@@ -120,7 +114,6 @@ export default function ProductDetails() {
           />
         </div>
 
-        {/* INFO */}
         <div>
 
           <p className="text-purple-400 mb-2">
@@ -131,7 +124,6 @@ export default function ProductDetails() {
             {product.name}
           </h1>
 
-          {/* FAKE API RATING */}
           {product.rating && (
             <div className="flex items-center gap-2 mb-4">
               <FaStar className="text-yellow-400" />

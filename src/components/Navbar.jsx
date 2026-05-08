@@ -16,7 +16,6 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  // Close menu on ESC key
   useEffect(() => {
     const closeOnEsc = (e) => {
       if (e.key === "Escape") setMenuOpen(false);
@@ -27,29 +26,24 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ================= NAVBAR ================= */}
       <nav className="bg-white shadow sticky top-0 z-50">
         <div className="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-6 py-4">
 
-          {/* LOGO */}
           <h1 className="text-xl font-bold text-indigo-600">
             LUXE
           </h1>
 
-          {/* DESKTOP LINKS */}
           <div className="hidden md:flex gap-6 items-center">
             <Link className="hover:text-indigo-600" to="/">Home</Link>
             <Link className="hover:text-indigo-600" to="/cart">Cart</Link>
             <Link className="hover:text-indigo-600" to="/orders">Orders</Link>
             <Link className="hover:text-indigo-600" to="/profile">Profile</Link>
 
-            {/* ✅ CONTACT ADDED */}
             <Link className="hover:text-indigo-600" to="/contact">
               Contact
             </Link>
           </div>
 
-          {/* AUTH DESKTOP */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
@@ -74,7 +68,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* MOBILE TOGGLE */}
           <button
             className="md:hidden text-2xl"
             aria-label="Toggle menu"
@@ -84,7 +77,6 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* ================= MOBILE OVERLAY ================= */}
         <div
           className={`fixed inset-0 bg-black/40 md:hidden transition-opacity duration-300 ${
             menuOpen ? "opacity-100 visible" : "opacity-0 invisible"
@@ -92,13 +84,11 @@ export default function Navbar() {
           onClick={() => setMenuOpen(false)}
         />
 
-        {/* ================= MOBILE MENU ================= */}
         <div
           className={`fixed top-0 right-0 h-full w-3/4 max-w-xs bg-white shadow-lg md:hidden transform transition-transform duration-300 z-50 p-6 ${
             menuOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          {/* MENU LINKS */}
           <div className="flex flex-col gap-4 text-lg font-medium">
 
             <Link
@@ -133,7 +123,6 @@ export default function Navbar() {
               Profile
             </Link>
 
-            {/* ✅ CONTACT ADDED */}
             <Link
               onClick={() => setMenuOpen(false)}
               className="hover:text-indigo-600 py-2 border-b"
@@ -146,7 +135,6 @@ export default function Navbar() {
 
           <hr className="my-5" />
 
-          {/* AUTH SECTION */}
           {user ? (
             <div className="space-y-3">
               <p className="text-gray-700 font-medium">👋 {user.name}</p>

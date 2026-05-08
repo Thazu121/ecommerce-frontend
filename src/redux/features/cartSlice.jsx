@@ -13,23 +13,18 @@ const cartSlice = createSlice({
 
   reducers: {
 
-    // =========================
-    // ADD TO CART
-    // =========================
+  
     addToCart: (state, action) => {
 
       const product = action.payload;
 
-      // SUPPORT BOTH id AND _id
       const id = product._id || product.id;
 
-      // CHECK EXISTING ITEM
       const existing = state.items.find(
         (item) =>
           (item._id || item.id) === id
       );
 
-      // IF EXISTS -> INCREASE QTY
       if (existing) {
 
         existing.quantity +=
@@ -46,15 +41,12 @@ const cartSlice = createSlice({
         });
       }
 
-      // RECALCULATE TOTALS
       cartSlice.caseReducers.calculateTotals(
         state
       );
     },
 
-    // =========================
-    // DECREASE QUANTITY
-    // =========================
+
     decreaseQuantity: (
       state,
       action
@@ -69,29 +61,24 @@ const cartSlice = createSlice({
 
       if (!item) return;
 
-      // REDUCE QUANTITY
       if (item.quantity > 1) {
 
         item.quantity -= 1;
 
       } else {
 
-        // REMOVE ITEM
         state.items = state.items.filter(
           (i) =>
             (i._id || i.id) !== id
         );
       }
 
-      // RECALCULATE
       cartSlice.caseReducers.calculateTotals(
         state
       );
     },
 
-    // =========================
-    // REMOVE ITEM
-    // =========================
+   
     removeFromCart: (
       state,
       action
@@ -109,9 +96,7 @@ const cartSlice = createSlice({
       );
     },
 
-    // =========================
-    // CALCULATE TOTALS
-    // =========================
+   
     calculateTotals: (state) => {
 
       let totalQty = 0;
@@ -130,9 +115,7 @@ const cartSlice = createSlice({
       state.totalPrice = totalPrice;
     },
 
-    // =========================
-    // CLEAR CART
-    // =========================
+   
     clearCart: (state) => {
 
       state.items = [];

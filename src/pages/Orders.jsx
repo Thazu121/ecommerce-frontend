@@ -16,7 +16,6 @@ export default function Orders() {
 
   const orders = useSelector((state) => state.orders.orders);
 
-  // ================= FETCH ORDERS =================
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -30,7 +29,6 @@ export default function Orders() {
 
         console.log("ORDERS FROM BACKEND:", res.data);
 
-        // ✅ FIXED: extract orders properly
         dispatch(setOrders(res.data.orders));
 
       } catch (err) {
@@ -73,7 +71,6 @@ export default function Orders() {
                   {new Date(order.createdAt).toDateString()}
                 </p>
 
-                {/* PRODUCTS */}
                 <div className="mt-4 space-y-3">
 
                   {order.products.map((item, i) => (
@@ -103,7 +100,6 @@ export default function Orders() {
 
                 </div>
 
-                {/* TOTAL */}
                 <div className="text-right font-bold mt-4">
                   Total: ₹{order.totalPrice}
                 </div>

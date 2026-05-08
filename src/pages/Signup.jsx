@@ -24,12 +24,10 @@ export default function Signup() {
 
   const [errors, setErrors] = useState({});
 
-  // 🧠 input handler
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ validation
   const validate = () => {
     let newErrors = {};
 
@@ -58,7 +56,6 @@ export default function Signup() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // 🚀 submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -108,17 +105,14 @@ export default function Signup() {
           </p>
         </div>
 
-        {/* API Error */}
         {error && (
           <p className="text-red-500 text-sm text-center mb-3">
             {error}
           </p>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* Name */}
           <div>
             <input
               name="name"
@@ -138,7 +132,6 @@ export default function Signup() {
             )}
           </div>
 
-          {/* Email */}
           <div>
             <input
               name="email"
@@ -158,7 +151,6 @@ export default function Signup() {
             )}
           </div>
 
-          {/* Password */}
           <div>
             <input
               type="password"
@@ -179,7 +171,6 @@ export default function Signup() {
             )}
           </div>
 
-          {/* Confirm Password */}
           <div>
             <input
               type="password"
@@ -200,7 +191,6 @@ export default function Signup() {
             )}
           </div>
 
-          {/* Button */}
           <button
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-500 transition disabled:opacity-50"
@@ -209,7 +199,6 @@ export default function Signup() {
           </button>
         </form>
 
-        {/* Login Link */}
         <p className="text-center text-sm mt-6 text-gray-500">
           Already have an account?
           <Link

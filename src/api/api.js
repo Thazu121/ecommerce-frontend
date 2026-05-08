@@ -1,9 +1,8 @@
 import axios from "axios"
 const API = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "https://ecommerce-backendport-5000-mongo-uri.onrender.com",
 });
 
-// 🔐 Attach token automatically
 API.interceptors.request.use(
   (req) => {
     const token = localStorage.getItem("token");

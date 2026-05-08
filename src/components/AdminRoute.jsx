@@ -4,7 +4,6 @@ import { Navigate } from "react-router-dom";
 export default function AdminRoute({ children }) {
   const user = useSelector((state) => state.auth.user);
 
-  // ❌ not logged in
   if (!user) {
     return <Navigate to="/login" replace />;
   }

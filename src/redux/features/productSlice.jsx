@@ -11,30 +11,25 @@ const productSlice = createSlice({
   initialState,
 
   reducers: {
-    // 🔄 FETCH START
     fetchStart: (state) => {
       state.loading = true;
       state.error = null;
     },
 
-    // ✅ FETCH SUCCESS
     fetchSuccess: (state, action) => {
       state.loading = false;
       state.items = action.payload;
     },
 
-    // ❌ FETCH FAILURE
     fetchFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
 
-    // ➕ ADD PRODUCT
     addProduct: (state, action) => {
       state.items.push(action.payload);
     },
 
-    // ✏️ UPDATE PRODUCT
     updateProduct: (state, action) => {
       const index = state.items.findIndex(
         (item) => item.id === action.payload.id
@@ -45,7 +40,6 @@ const productSlice = createSlice({
       }
     },
 
-    // ❌ DELETE PRODUCT
     deleteProduct: (state, action) => {
       state.items = state.items.filter(
         (item) => item.id !== action.payload

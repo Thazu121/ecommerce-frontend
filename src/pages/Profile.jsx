@@ -29,7 +29,6 @@ export default function Profile() {
     },
   });
 
-  // ================= HANDLE INPUT =================
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -49,12 +48,10 @@ export default function Profile() {
     }
   };
 
-  // ================= SAVE PROFILE =================
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      // clean payload (IMPORTANT FIX)
       const payload = {
         name: form.name?.trim(),
         email: form.email?.trim(),
@@ -74,7 +71,6 @@ export default function Profile() {
 
       console.log("UPDATED USER:", res.data);
 
-      // update redux
       dispatch(setUser(res.data.user));
 
       setEditMode(false);

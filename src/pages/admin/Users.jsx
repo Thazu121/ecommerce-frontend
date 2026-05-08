@@ -11,7 +11,7 @@ export default function Users() {
       setLoading(true);
       setError("");
 
-      const res = await API.get("/admin/users"); // 🔥 FIXED
+      const res = await API.get("/admin/users")
 
       console.log("USERS RESPONSE:", res.data);
 
