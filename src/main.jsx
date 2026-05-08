@@ -23,6 +23,8 @@ import Signup from "./pages/Signup.jsx";
 import Profile from "./pages/Profile.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 
+import Contact from "./pages/Contact.jsx";
+
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import Products from "./pages/admin/Products.jsx";
@@ -66,6 +68,12 @@ const router = createBrowserRouter([
             <Profile />
           </ProtectedRoute>
         ),
+      },
+
+      // ================= CONTACT ROUTE =================
+      {
+        path: "contact",
+        element: <Contact />,
       },
     ],
   },

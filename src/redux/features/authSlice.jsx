@@ -11,60 +11,45 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // 🔐 LOGIN START
+
     loginStart: (state) => {
       state.loading = true;
       state.error = null;
     },
 
-    // ✅ LOGIN SUCCESS
     loginSuccess: (state, action) => {
       state.loading = false;
-
-      // 👇 IMPORTANT: expects { user, token }
       state.user = action.payload.user;
       state.token = action.payload.token;
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(action.payload.user)
-      );
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
       localStorage.setItem("token", action.payload.token);
     },
 
-    // ❌ LOGIN FAIL
     loginFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
 
-    // 🧾 SIGNUP START
     signupStart: (state) => {
       state.loading = true;
       state.error = null;
     },
 
-    // ✅ SIGNUP SUCCESS
     signupSuccess: (state, action) => {
       state.loading = false;
-
       state.user = action.payload.user;
       state.token = action.payload.token;
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(action.payload.user)
-      );
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
       localStorage.setItem("token", action.payload.token);
     },
 
-    // ❌ SIGNUP FAIL
     signupFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
 
-    // 🚪 LOGOUT
     logout: (state) => {
       state.user = null;
       state.token = null;
@@ -72,6 +57,16 @@ const authSlice = createSlice({
 
       localStorage.removeItem("user");
       localStorage.removeItem("token");
+    },
+
+    // ✅ NEW IMPORTANT ACTION
+    setUser: (state, action) => {
+      state.user = action.payload;
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(action.payload)
+      );
     },
   },
 });
@@ -84,6 +79,7 @@ export const {
   signupSuccess,
   signupFailure,
   logout,
+  setUser,
 } = authSlice.actions;
 
 export default authSlice.reducer;

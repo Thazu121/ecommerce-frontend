@@ -9,6 +9,11 @@ const orderSlice = createSlice({
   initialState,
 
   reducers: {
+    // ✅ SET ALL ORDERS (IMPORTANT FIX)
+    setOrders: (state, action) => {
+      state.orders = action.payload;
+    },
+
     // ➕ Add Order
     addOrder: (state, action) => {
       state.orders.push(action.payload);
@@ -17,7 +22,7 @@ const orderSlice = createSlice({
     // ❌ Remove Order
     removeOrder: (state, action) => {
       state.orders = state.orders.filter(
-        (order) => order.id !== action.payload
+        (order) => order._id !== action.payload
       );
     },
 
@@ -29,6 +34,7 @@ const orderSlice = createSlice({
 });
 
 export const {
+  setOrders,
   addOrder,
   removeOrder,
   clearOrders,

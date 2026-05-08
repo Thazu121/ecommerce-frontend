@@ -1,7 +1,7 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/features/authSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const user = useSelector((state) => state.auth.user);
@@ -16,10 +16,19 @@ export default function Navbar() {
     navigate("/login");
   };
 
+  // Close menu on ESC key
+  useEffect(() => {
+    const closeOnEsc = (e) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEsc);
+    return () => window.removeEventListener("keydown", closeOnEsc);
+  }, []);
+
   return (
     <>
+      {/* ================= NAVBAR ================= */}
       <nav className="bg-white shadow sticky top-0 z-50">
-
         <div className="flex justify-between items-center max-w-7xl mx-auto px-4 md:px-6 py-4">
 
           {/* LOGO */}
@@ -29,17 +38,19 @@ export default function Navbar() {
 
           {/* DESKTOP LINKS */}
           <div className="hidden md:flex gap-6 items-center">
+            <Link className="hover:text-indigo-600" to="/">Home</Link>
+            <Link className="hover:text-indigo-600" to="/cart">Cart</Link>
+            <Link className="hover:text-indigo-600" to="/orders">Orders</Link>
+            <Link className="hover:text-indigo-600" to="/profile">Profile</Link>
 
-            <Link to="/">Home</Link>
-            <Link to="/cart">Cart</Link>
-            <Link to="/orders">Orders</Link>
-            <Link to="/profile">Profile</Link>
-
+            {/* ✅ CONTACT ADDED */}
+            <Link className="hover:text-indigo-600" to="/contact">
+              Contact
+            </Link>
           </div>
 
-          {/* AUTH (DESKTOP) */}
+          {/* AUTH DESKTOP */}
           <div className="hidden md:flex items-center gap-3">
-
             {user ? (
               <>
                 <span className="text-sm font-medium text-gray-700">
@@ -48,7 +59,7 @@ export default function Navbar() {
 
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500 text-white px-4 py-2 rounded"
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
                 >
                   Logout
                 </button>
@@ -56,77 +67,110 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className="bg-indigo-600 text-white px-4 py-2 rounded"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
               >
                 Login
               </Link>
             )}
-
           </div>
 
-          {/* MOBILE BUTTON */}
+          {/* MOBILE TOGGLE */}
           <button
             className="md:hidden text-2xl"
+            aria-label="Toggle menu"
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            ☰
+            {menuOpen ? "✕" : "☰"}
           </button>
-
         </div>
 
-        {/* ================= MOBILE MENU ================= */}
-        {menuOpen && (
-          <div className="md:hidden px-4 pb-4 space-y-3 bg-white border-t">
+        {/* ================= MOBILE OVERLAY ================= */}
+        <div
+          className={`fixed inset-0 bg-black/40 md:hidden transition-opacity duration-300 ${
+            menuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+          }`}
+          onClick={() => setMenuOpen(false)}
+        />
 
-            <Link onClick={() => setMenuOpen(false)} to="/">
+        {/* ================= MOBILE MENU ================= */}
+        <div
+          className={`fixed top-0 right-0 h-full w-3/4 max-w-xs bg-white shadow-lg md:hidden transform transition-transform duration-300 z-50 p-6 ${
+            menuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          {/* MENU LINKS */}
+          <div className="flex flex-col gap-4 text-lg font-medium">
+
+            <Link
+              onClick={() => setMenuOpen(false)}
+              className="hover:text-indigo-600 py-2 border-b"
+              to="/"
+            >
               Home
             </Link>
 
-            <Link onClick={() => setMenuOpen(false)} to="/cart">
+            <Link
+              onClick={() => setMenuOpen(false)}
+              className="hover:text-indigo-600 py-2 border-b"
+              to="/cart"
+            >
               Cart
             </Link>
 
-            <Link onClick={() => setMenuOpen(false)} to="/orders">
+            <Link
+              onClick={() => setMenuOpen(false)}
+              className="hover:text-indigo-600 py-2 border-b"
+              to="/orders"
+            >
               Orders
             </Link>
 
-            <Link onClick={() => setMenuOpen(false)} to="/profile">
+            <Link
+              onClick={() => setMenuOpen(false)}
+              className="hover:text-indigo-600 py-2 border-b"
+              to="/profile"
+            >
               Profile
             </Link>
 
-            <hr />
-
-            {user ? (
-              <div className="flex flex-col gap-2">
-
-                <span className="text-gray-700">
-                  👋 {user.name}
-                </span>
-
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setMenuOpen(false);
-                  }}
-                  className="bg-red-500 text-white px-4 py-2 rounded"
-                >
-                  Logout
-                </button>
-
-              </div>
-            ) : (
-              <Link
-                onClick={() => setMenuOpen(false)}
-                to="/login"
-                className="bg-indigo-600 text-white px-4 py-2 rounded inline-block"
-              >
-                Login
-              </Link>
-            )}
+            {/* ✅ CONTACT ADDED */}
+            <Link
+              onClick={() => setMenuOpen(false)}
+              className="hover:text-indigo-600 py-2 border-b"
+              to="/contact"
+            >
+              Contact
+            </Link>
 
           </div>
-        )}
 
+          <hr className="my-5" />
+
+          {/* AUTH SECTION */}
+          {user ? (
+            <div className="space-y-3">
+              <p className="text-gray-700 font-medium">👋 {user.name}</p>
+
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              onClick={() => setMenuOpen(false)}
+              to="/login"
+              className="block text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded"
+            >
+              Login
+            </Link>
+          )}
+        </div>
       </nav>
 
       <Outlet />

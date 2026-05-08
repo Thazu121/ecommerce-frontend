@@ -7,37 +7,32 @@ export default function Products() {
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
-    title: "",
+    name: "",
     price: "",
-    image: "",
+    category: "",
+    description: "",
+    image: null,
   });
 
+  const [preview, setPreview] = useState(null);
   const [editId, setEditId] = useState(null);
 
-  // ======================
-  // GET PRODUCTS (FIXED)
-  // ======================
+  // ================= GET PRODUCTS =================
   const fetchProducts = async () => {
     try {
       setLoading(true);
 
       const res = await API.get("/products");
 
-      console.log("API RESPONSE:", res.data); // DEBUG
-
-      // ✅ SAFE FIX (prevents map error)
-      const data =
-        Array.isArray(res.data)
-          ? res.data
-          : res.data.products ||
-            res.data.data ||
-            [];
+      const data = Array.isArray(res.data.product)
+        ? res.data.product
+        : res.data.products || [];
 
       setProducts(data);
 
     } catch (err) {
       console.log(err);
-      setProducts([]); // fallback safety
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -47,9 +42,7 @@ export default function Products() {
     fetchProducts();
   }, []);
 
-  // ======================
-  // INPUT CHANGE
-  // ======================
+  // ================= INPUT =================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -57,31 +50,67 @@ export default function Products() {
     });
   };
 
-  // ======================
-  // CREATE PRODUCT
-  // ======================
-  const handleCreate = async () => {
-    if (!form.title || !form.price || !form.image) return;
+  // ================= IMAGE VALIDATION =================
+  const handleImage = (e) => {
+    const file = e.target.files[0];
 
+    if (!file) return;
+
+    // ✅ TYPE CHECK
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files are allowed");
+      return;
+    }
+
+    // ✅ SIZE CHECK (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image must be less than 2MB");
+      return;
+    }
+
+    setForm({ ...form, image: file });
+
+    // preview image
+    setPreview(URL.createObjectURL(file));
+  };
+
+  // ================= CREATE =================
+  const handleCreate = async () => {
     try {
       setSubmitting(true);
 
-      await API.post("/products", form);
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("price", form.price);
+      formData.append("category", form.category);
+      formData.append("description", form.description);
 
-      setForm({ title: "", price: "", image: "" });
+      // ✅ only append if exists
+      if (form.image) {
+        formData.append("image", form.image);
+      }
 
+      await API.post("/products", formData);
+
+      setForm({
+        name: "",
+        price: "",
+        category: "",
+        description: "",
+        image: null,
+      });
+
+      setPreview(null);
       fetchProducts();
 
     } catch (err) {
-      console.log(err);
+      console.log(err.response?.data || err.message);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // ======================
-  // DELETE PRODUCT
-  // ======================
+  // ================= DELETE =================
   const handleDelete = async (id) => {
     try {
       await API.delete(`/products/${id}`);
@@ -91,159 +120,173 @@ export default function Products() {
     }
   };
 
-  // ======================
-  // EDIT PRODUCT
-  // ======================
-  const handleEdit = (product) => {
+  // ================= EDIT =================
+  const handleEdit = (p) => {
     setForm({
-      title: product.title,
-      price: product.price,
-      image: product.image,
+      name: p.name,
+      price: p.price,
+      category: p.category,
+      description: p.description,
+      image: null,
     });
 
-    setEditId(product._id);
+    setPreview(
+      p.image ? `http://localhost:5000${p.image}` : null
+    );
+
+    setEditId(p._id);
   };
 
-  // ======================
-  // UPDATE PRODUCT
-  // ======================
+  // ================= UPDATE =================
   const handleUpdate = async () => {
     try {
       setSubmitting(true);
 
-      await API.put(`/products/${editId}`, form);
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("price", form.price);
+      formData.append("category", form.category);
+      formData.append("description", form.description);
 
-      setForm({ title: "", price: "", image: "" });
+      if (form.image) {
+        formData.append("image", form.image);
+      }
+
+      await API.put(`/products/${editId}`, formData);
+
+      setForm({
+        name: "",
+        price: "",
+        category: "",
+        description: "",
+        image: null,
+      });
+
+      setPreview(null);
       setEditId(null);
-
       fetchProducts();
 
     } catch (err) {
-      console.log(err);
+      console.log(err.response?.data || err.message);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen">
 
-      {/* HEADER */}
-      <h1 className="text-2xl md:text-3xl font-bold mb-6">
+      <h1 className="text-2xl font-bold mb-6">
         🛠️ Products Admin Panel
       </h1>
 
-      {/* ================= FORM ================= */}
-      <div className="bg-white p-4 md:p-6 rounded-xl shadow mb-6">
+      {/* FORM */}
+      <div className="bg-white p-4 rounded-xl shadow mb-6 space-y-3">
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <input
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="Product Name"
+          className="border p-2 w-full rounded"
+        />
 
-          <input
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="Product Title"
-            className="border p-2 rounded w-full"
+        <input
+          name="price"
+          value={form.price}
+          onChange={handleChange}
+          placeholder="Price"
+          className="border p-2 w-full rounded"
+        />
+
+        <input
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+          placeholder="Category"
+          className="border p-2 w-full rounded"
+        />
+
+        <textarea
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          placeholder="Description"
+          className="border p-2 w-full rounded"
+        />
+
+        {/* IMAGE */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImage}
+          className="border p-2 w-full rounded"
+        />
+
+        {/* PREVIEW */}
+        {preview && (
+          <img
+            src={preview}
+            alt="preview"
+            className="w-32 h-32 object-cover mt-2 rounded"
           />
-
-          <input
-            name="price"
-            value={form.price}
-            onChange={handleChange}
-            placeholder="Price"
-            className="border p-2 rounded w-full"
-          />
-
-          <input
-            name="image"
-            value={form.image}
-            onChange={handleChange}
-            placeholder="Image URL"
-            className="border p-2 rounded w-full"
-          />
-
-        </div>
+        )}
 
         <button
-          disabled={submitting}
           onClick={editId ? handleUpdate : handleCreate}
-          className={`mt-4 w-full md:w-auto px-5 py-2 rounded text-white transition ${
-            editId ? "bg-green-600" : "bg-blue-600"
-          } ${submitting ? "opacity-50" : "hover:opacity-90"}`}
+          disabled={submitting}
+          className="bg-indigo-600 text-white px-4 py-2 rounded"
         >
-          {submitting
-            ? "Processing..."
-            : editId
-            ? "Update Product"
-            : "Add Product"}
+          {editId ? "Update Product" : "Add Product"}
         </button>
-
       </div>
 
-      {/* ================= LOADING ================= */}
-      {loading && (
-        <p className="text-gray-500 text-center">
-          Loading products...
-        </p>
-      )}
+      {/* LIST */}
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="grid md:grid-cols-3 gap-4">
 
-      {/* ================= EMPTY ================= */}
-      {!loading && products.length === 0 && (
-        <p className="text-gray-500 text-center">
-          No products found
-        </p>
-      )}
+          {products.map((p) => (
+            <div key={p._id} className="bg-white p-4 shadow rounded">
 
-      {/* ================= PRODUCT LIST ================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-
-        {Array.isArray(products) &&
-          products.map((p) => (
-            <div
-              key={p._id}
-              className="bg-white p-4 rounded-xl shadow flex flex-col gap-3 hover:shadow-lg transition"
-            >
-
-              {/* IMAGE */}
               <img
-                src={p.image}
-                className="w-full h-40 object-cover rounded"
+                src={
+                  p.image
+                    ? `http://localhost:5000${p.image}`
+                    : "/placeholder.png"
+                }
+                alt={p.name}
+                className="w-full h-40 object-cover rounded mb-2"
               />
 
-              {/* INFO */}
-              <div>
-                <h2 className="font-semibold text-lg line-clamp-1">
-                  {p.title}
-                </h2>
+              <h2 className="font-bold">{p.name}</h2>
+              <p>₹{p.price}</p>
+              <p className="text-sm text-gray-600">{p.category}</p>
+              <p className="text-sm text-gray-500">{p.description}</p>
 
-                <p className="text-gray-600 font-medium">
-                  ₹{p.price}
-                </p>
-              </div>
-
-              {/* ACTIONS */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 mt-3">
 
                 <button
                   onClick={() => handleEdit(p)}
-                  className="flex-1 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                  className="bg-yellow-500 text-white px-3 py-1 rounded"
                 >
                   Edit
                 </button>
 
                 <button
                   onClick={() => handleDelete(p._id)}
-                  className="flex-1 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  className="bg-red-500 text-white px-3 py-1 rounded"
                 >
                   Delete
                 </button>
 
               </div>
-
             </div>
           ))}
-      </div>
 
+        </div>
+      )}
     </div>
   );
 }
