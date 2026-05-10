@@ -17,7 +17,7 @@ export default function Dashboard() {
 
       const [productsRes, usersRes] = await Promise.all([
         API.get("/products"),
-        API.get("/admin/users"), // 🔥 FIXED
+        API.get("/admin/users"),
       ]);
 
       const products =
