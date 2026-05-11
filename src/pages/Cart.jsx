@@ -29,9 +29,7 @@ export default function CartList() {
     (state) => state.auth.user
   );
 
-  // =========================
-  // SAVE CART
-  // =========================
+  
   useEffect(() => {
 
     if (user?._id) {
@@ -44,9 +42,7 @@ export default function CartList() {
 
   }, [items, user]);
 
-  // =========================
-  // IMAGE
-  // =========================
+
   const getImage = (img) => {
 
     if (!img) {
@@ -60,9 +56,7 @@ export default function CartList() {
     return `https://ecommerce-backendport-5000-mongo-uri.onrender.com${img}`;
   };
 
-  // =========================
-  // TOTALS
-  // =========================
+  
   const subtotal = items.reduce(
     (acc, item) =>
       acc +
@@ -76,9 +70,7 @@ export default function CartList() {
 
   const total = subtotal + delivery;
 
-  // =========================
-  // PLACE ORDER
-  // =========================
+ 
   const handlePlaceOrder = async () => {
 
     try {
@@ -151,9 +143,7 @@ export default function CartList() {
     }
   };
 
-  // =========================
-  // EMPTY
-  // =========================
+ 
   if (items.length === 0) {
 
     return (
@@ -174,7 +164,6 @@ export default function CartList() {
 
     <div className="max-w-7xl mx-auto px-4 py-8 grid lg:grid-cols-3 gap-6">
 
-      {/* ITEMS */}
       <div className="lg:col-span-2 space-y-4">
 
         {items.map((item) => (
@@ -184,14 +173,12 @@ export default function CartList() {
             className="bg-zinc-900 text-white rounded-2xl p-5 flex flex-col sm:flex-row gap-5"
           >
 
-            {/* IMAGE */}
             <img
               src={getImage(item.image)}
               alt={item.title}
               className="w-full sm:w-32 h-32 object-contain bg-white rounded-xl p-2"
             />
 
-            {/* INFO */}
             <div className="flex-1">
 
               <h2 className="text-lg font-semibold">
@@ -238,7 +225,6 @@ export default function CartList() {
 
             </div>
 
-            {/* PRICE */}
             <div className="flex sm:flex-col justify-between items-end">
 
               <p className="text-xl font-bold text-purple-500">
@@ -269,7 +255,6 @@ export default function CartList() {
         ))}
       </div>
 
-      {/* SUMMARY */}
       <div className="bg-zinc-900 text-white rounded-2xl p-5 h-fit">
 
         <h2 className="text-2xl font-bold mb-5">
