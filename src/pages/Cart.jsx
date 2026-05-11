@@ -18,47 +18,40 @@ import {
 import API from "../api/api";
 
 export default function CartList() {
-  const { items } = useSelector((state) => state.cart);
+
+  const dispatch = useDispatch();
+
+  const { items } = useSelector(
+    (state) => state.cart
+  );
 
   const user = useSelector(
     (state) => state.auth.user
   );
 
-  const dispatch = useDispatch();
-
-  // LOAD CART
-  useEffect(() => {
-    if (user?._id) {
-      const saved = localStorage.getItem(
-        `cart_${user._id}`
-      );
-
-      if (saved) {
-        const parsed = JSON.parse(saved);
-
-        dispatch(clearCart());
-
-        parsed.forEach((item) => {
-          dispatch(addToCart(item));
-        });
-      }
-    }
-  }, [user, dispatch]);
-
+  // =========================
   // SAVE CART
+  // =========================
   useEffect(() => {
+
     if (user?._id) {
+
       localStorage.setItem(
         `cart_${user._id}`,
         JSON.stringify(items)
       );
     }
+
   }, [items, user]);
 
-  // IMAGE FIX
+  // =========================
+  // IMAGE
+  // =========================
   const getImage = (img) => {
-    if (!img)
+
+    if (!img) {
       return "https://via.placeholder.com/300";
+    }
 
     if (img.startsWith("http")) {
       return img;
@@ -67,22 +60,29 @@ export default function CartList() {
     return `https://ecommerce-backendport-5000-mongo-uri.onrender.com${img}`;
   };
 
-  // TOTALS FIX
+  // =========================
+  // TOTALS
+  // =========================
   const subtotal = items.reduce(
     (acc, item) =>
       acc +
-      (Number(item.price) || 0) *
-        (Number(item.quantity) || 1),
+      Number(item.price || 0) *
+        Number(item.quantity || 1),
     0
   );
 
-  const delivery = subtotal > 5000 ? 0 : 99;
+  const delivery =
+    subtotal > 5000 ? 0 : 99;
 
   const total = subtotal + delivery;
 
+  // =========================
   // PLACE ORDER
+  // =========================
   const handlePlaceOrder = async () => {
+
     try {
+
       const token =
         localStorage.getItem("token");
 
@@ -92,38 +92,35 @@ export default function CartList() {
       }
 
       const payload = {
-        products: items.map((item) => ({
-          productId: String(
-            item._id || item.id
-          ),
 
-          source:
-            item.source || "mongo",
+        products: items.map((item) => ({
+
+          productId:
+            item._id || item.id,
 
           title:
             item.title ||
-            item.name ||
-            "Product",
+            item.name,
 
-          image: item.image || "",
+          image:
+            item.image,
 
           price:
-            Number(item.price) || 0,
+            Number(item.price),
 
           quantity:
-            Number(item.quantity) || 1,
+            Number(item.quantity),
+
+          source:
+            item.source || "fake",
         })),
 
-        totalPrice:
-          Number(total) || 0,
+        totalPrice: total,
       };
 
-      console.log(
-        "ORDER PAYLOAD:",
-        payload
-      );
+      console.log(payload);
 
-      const res = await API.post(
+      await API.post(
         "/order",
         payload,
         {
@@ -133,79 +130,80 @@ export default function CartList() {
         }
       );
 
-      console.log(res.data);
-
       dispatch(clearCart());
 
       localStorage.removeItem(
         `cart_${user._id}`
       );
 
-      alert("Order placed successfully");
+      alert(
+        "Order placed successfully"
+      );
 
     } catch (err) {
+
       console.log(
-        err.response?.data || err.message
+        err.response?.data ||
+          err.message
       );
 
-      alert(
-        err.response?.data?.message ||
-          "Order failed"
-      );
+      alert("Order failed");
     }
   };
 
-  // EMPTY CART
+  // =========================
+  // EMPTY
+  // =========================
   if (items.length === 0) {
+
     return (
-      <div className="flex flex-col justify-center items-center min-h-[60vh] text-gray-400">
+
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-gray-400">
+
         <ShoppingCart size={80} />
 
-        <p className="mt-3 text-lg">
+        <p className="mt-4 text-lg">
           Your cart is empty
         </p>
+
       </div>
     );
   }
 
   return (
+
     <div className="max-w-7xl mx-auto px-4 py-8 grid lg:grid-cols-3 gap-6">
 
-      {/* CART ITEMS */}
+      {/* ITEMS */}
       <div className="lg:col-span-2 space-y-4">
 
         {items.map((item) => (
 
           <div
             key={item._id || item.id}
-            className="bg-zinc-900 text-white p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row gap-4"
+            className="bg-zinc-900 text-white rounded-2xl p-5 flex flex-col sm:flex-row gap-5"
           >
 
             {/* IMAGE */}
             <img
               src={getImage(item.image)}
-              alt={
-                item.title ||
-                item.name
-              }
+              alt={item.title}
               className="w-full sm:w-32 h-32 object-contain bg-white rounded-xl p-2"
             />
 
             {/* INFO */}
             <div className="flex-1">
 
-              <h2 className="font-semibold text-lg">
-                {item.title ||
-                  item.name}
+              <h2 className="text-lg font-semibold">
+                {item.title}
               </h2>
 
-              <p className="text-zinc-400 text-sm mt-1">
-                ₹
-                {Number(item.price) || 0}
+              <p className="text-zinc-400 mt-1">
+                ₹{item.price}
               </p>
 
-              {/* QTY */}
-              <div className="flex items-center gap-3 mt-4">
+              {/* QUANTITY */}
+              <div className="flex items-center gap-3 mt-5">
 
                 <button
                   onClick={() =>
@@ -221,7 +219,7 @@ export default function CartList() {
                   <Minus size={16} />
                 </button>
 
-                <span className="px-3">
+                <span>
                   {item.quantity}
                 </span>
 
@@ -237,17 +235,18 @@ export default function CartList() {
                 </button>
 
               </div>
+
             </div>
 
             {/* PRICE */}
-            <div className="flex sm:flex-col justify-between items-center sm:items-end">
+            <div className="flex sm:flex-col justify-between items-end">
 
-              <p className="text-purple-500 font-bold text-lg">
+              <p className="text-xl font-bold text-purple-500">
+
                 ₹
-                {(Number(item.price) || 0) *
-                  (Number(
-                    item.quantity
-                  ) || 1)}
+                {item.price *
+                  item.quantity}
+
               </p>
 
               <button
@@ -259,7 +258,7 @@ export default function CartList() {
                     )
                   )
                 }
-                className="text-red-400 mt-2"
+                className="text-red-400"
               >
                 <Trash2 />
               </button>
@@ -267,47 +266,47 @@ export default function CartList() {
             </div>
 
           </div>
-
         ))}
-
       </div>
 
       {/* SUMMARY */}
-      <div className="bg-zinc-900 text-white p-5 rounded-2xl h-fit">
+      <div className="bg-zinc-900 text-white rounded-2xl p-5 h-fit">
 
-        <h2 className="text-xl font-bold mb-4">
+        <h2 className="text-2xl font-bold mb-5">
           Order Summary
         </h2>
 
-        <div className="flex justify-between">
-          <span>Subtotal</span>
+        <div className="space-y-3">
 
-          <span>
-            ₹{subtotal}
-          </span>
-        </div>
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span>₹{subtotal}</span>
+          </div>
 
-        <div className="flex justify-between mt-2">
-          <span>Delivery</span>
+          <div className="flex justify-between">
+            <span>Delivery</span>
+            <span>
+              {delivery === 0
+                ? "Free"
+                : `₹${delivery}`}
+            </span>
+          </div>
 
-          <span>
-            {delivery === 0
-              ? "Free"
-              : `₹${delivery}`}
-          </span>
-        </div>
+          <div className="flex justify-between text-lg font-bold pt-3 border-t border-zinc-700">
 
-        <div className="flex justify-between mt-4 text-lg font-bold">
-          <span>Total</span>
+            <span>Total</span>
 
-          <span className="text-purple-500">
-            ₹{total}
-          </span>
+            <span className="text-purple-500">
+              ₹{total}
+            </span>
+
+          </div>
+
         </div>
 
         <button
           onClick={handlePlaceOrder}
-          className="w-full mt-6 bg-purple-600 hover:bg-purple-700 py-3 rounded-xl transition"
+          className="w-full mt-6 bg-purple-600 hover:bg-purple-700 py-3 rounded-xl"
         >
           Place Order
         </button>
